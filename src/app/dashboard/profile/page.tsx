@@ -120,7 +120,7 @@ export default function ProfilePage() {
             <div className="p-5 flex items-center justify-between group cursor-pointer hover:bg-muted/30 transition-colors">
               <div>
                 <p className="text-sm font-medium">Pay Per Use</p>
-                <p className="text-xs text-muted-foreground">₹19 for 2.5 credits (1 analysis)</p>
+                <p className="text-xs text-muted-foreground">₹15 for 2.5 credits (1 analysis)</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
             </div>

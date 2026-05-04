@@ -338,7 +338,7 @@ export function InputFlow() {
                   <p className="text-xs text-muted-foreground mt-1">One-time analysis (2.5 credits)</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-bold">₹19</span>
+                  <span className="text-lg font-bold">₹15</span>
                 </div>
               </button>
 
