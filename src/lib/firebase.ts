@@ -11,9 +11,14 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase only once
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const auth = getAuth(app);
+// Initialize Firebase only once, but only if we have an API key
+// This prevents build-time crashes on Vercel when env vars are missing
+const app = 
+  typeof window !== "undefined" || process.env.NEXT_PUBLIC_FIREBASE_API_KEY
+    ? (getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0])
+    : null;
+
+const auth = app ? getAuth(app) : ({} as ReturnType<typeof getAuth>);
 const googleProvider = new GoogleAuthProvider();
 
 export { app, auth, googleProvider };

@@ -34,6 +34,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Skip if auth is not initialized (placeholder object)
+    if (!auth || !auth.onAuthStateChanged) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
@@ -42,6 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!auth || !auth.onAuthStateChanged) {
+      throw new Error("Firebase Auth is not initialized. Check your environment variables.");
+    }
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
@@ -51,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!auth || !auth.onAuthStateChanged) return;
     try {
       await firebaseSignOut(auth);
     } catch (error) {
