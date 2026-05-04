@@ -1,0 +1,68 @@
+export type Domain = "career" | "finance" | "personal" | "business";
+
+export interface DomainParameter {
+  id: string;
+  label: string;
+  description: string;
+  value: number; // 0-100
+}
+
+export const DOMAIN_PARAMETERS: Record<Domain, DomainParameter[]> = {
+  career: [
+    { id: "risk_tolerance", label: "Risk Tolerance", description: "How much risk can you handle?", value: 50 },
+    { id: "growth_vs_stability", label: "Growth vs Stability", description: "Prefer growth or stability?", value: 50 },
+    { id: "work_life_balance", label: "Work-Life Balance", description: "How important is work-life balance?", value: 50 },
+  ],
+  finance: [
+    { id: "risk_tolerance", label: "Risk Tolerance", description: "How much financial risk can you take?", value: 50 },
+    { id: "time_horizon", label: "Time Horizon", description: "Short-term vs long-term outlook?", value: 50 },
+    { id: "liquidity_needs", label: "Liquidity Needs", description: "How quickly might you need access to funds?", value: 50 },
+  ],
+  personal: [
+    { id: "emotional_impact", label: "Emotional Impact", description: "How emotionally significant is this?", value: 50 },
+    { id: "reversibility", label: "Reversibility", description: "Can this decision be reversed?", value: 50 },
+    { id: "time_horizon", label: "Time Horizon", description: "Short-term vs long-term impact?", value: 50 },
+  ],
+  business: [
+    { id: "financial_pressure", label: "Financial Pressure", description: "Current financial constraints?", value: 50 },
+    { id: "strategic_impact", label: "Strategic Impact", description: "How strategic is this decision?", value: 50 },
+    { id: "execution_complexity", label: "Execution Complexity", description: "How complex to execute?", value: 50 },
+  ],
+};
+
+export const DOMAIN_LABELS: Record<Domain, string> = {
+  career: "Career",
+  finance: "Finance",
+  personal: "Personal",
+  business: "Business",
+};
+
+export const DOMAIN_ICONS: Record<Domain, string> = {
+  career: "Briefcase",
+  finance: "TrendingUp",
+  personal: "Heart",
+  business: "Building2",
+};
+
+export interface OptionInput {
+  id: string;
+  text: string;
+}
+
+export interface AnalysisOptionResult {
+  option: string;
+  successProbability: number;
+  riskLevel: string;
+  rewardLevel: string;
+  pros: string[];
+  cons: string[];
+  detailedAnalysis: string;
+}
+
+export interface AnalysisResult {
+  recommendation: string;
+  recommendedOption: string;
+  insight: string;
+  whyThisWorks: string;
+  options: AnalysisOptionResult[];
+}
