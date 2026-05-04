@@ -1,8 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { Sparkles, ArrowRight, BrainCircuit, Target, Zap, ShieldCheck, BarChart3, Clock } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle"; // I need to create this or handle it here. I'll just use the button from the old page for now, or just leave it for the login page and keep landing page static or simple. Actually I will create a ThemeToggle component or just put it in the header.
-
-// Let's create a Client Component wrapper for the theme toggle, or just make the whole landing page a client component for simplicity, but a server component is better for SEO. Let's stick to a Server Component for the landing page where possible, and import a client component for the header.
+import { motion } from "framer-motion";
 
 export default function LandingPage() {
   return (
@@ -11,13 +11,23 @@ export default function LandingPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-2.5"
+          >
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
             <span className="font-semibold tracking-tight">DecisionSimulator</span>
-          </div>
-          <div className="flex items-center gap-4">
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-4"
+          >
             <Link 
               href="/login"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
@@ -30,7 +40,7 @@ export default function LandingPage() {
             >
               Get Started
             </Link>
-          </div>
+          </motion.div>
         </div>
       </header>
 
@@ -42,20 +52,40 @@ export default function LandingPage() {
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl -z-10" />
           
           <div className="max-w-7xl mx-auto px-6 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50 text-sm text-muted-foreground mb-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50 text-sm text-muted-foreground mb-8"
+            >
               <Sparkles className="w-4 h-4 text-primary" />
               <span>Powered by Gemini 2.0 Flash</span>
-            </div>
+            </motion.div>
             
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 max-w-4xl mx-auto leading-[1.1]">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 max-w-4xl mx-auto leading-[1.1]"
+            >
               Make confident decisions with <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">AI precision.</span>
-            </h1>
+            </motion.h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+            >
               Stop second-guessing. Simulate outcomes, evaluate risks, and get actionable insights for your career, business, and personal life in seconds.
-            </p>
+            </motion.p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
               <Link 
                 href="/login"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium text-lg hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20"
@@ -69,21 +99,27 @@ export default function LandingPage() {
               >
                 See how it works
               </a>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* Features Section */}
         <section id="features" className="py-24 bg-muted/30 border-y border-border/50">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-16"
+            >
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 Everything you need to decide.
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
                 Our AI analyzes your scenario against multiple parameters to provide a comprehensive breakdown of your options.
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
@@ -118,7 +154,14 @@ export default function LandingPage() {
                   description: "Remove emotional blindspots with an objective AI that looks purely at the variables you provide."
                 }
               ].map((feature, i) => (
-                <div key={i} className="bg-background rounded-3xl p-8 border border-border/50 hover:border-border transition-colors shadow-sm">
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="bg-background rounded-3xl p-8 border border-border/50 hover:border-border transition-colors shadow-sm"
+                >
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
@@ -126,7 +169,7 @@ export default function LandingPage() {
                   <p className="text-muted-foreground leading-relaxed">
                     {feature.description}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -135,7 +178,13 @@ export default function LandingPage() {
         {/* CTA Section */}
         <section className="py-32 relative overflow-hidden">
           <div className="absolute inset-0 bg-primary/5" />
-          <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="max-w-4xl mx-auto px-6 text-center relative z-10"
+          >
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
               Ready to make better choices?
             </h2>
@@ -149,7 +198,7 @@ export default function LandingPage() {
               Get Started for Free
               <ArrowRight className="w-5 h-5" />
             </Link>
-          </div>
+          </motion.div>
         </section>
       </main>
 
