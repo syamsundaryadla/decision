@@ -119,14 +119,14 @@ export default function ProfilePage() {
             </div>
             <div className="p-5 flex items-center justify-between group cursor-pointer hover:bg-muted/30 transition-colors">
               <div>
-                <p className="text-sm font-medium">Billing History</p>
-                <p className="text-xs text-muted-foreground">View your past invoices</p>
+                <p className="text-sm font-medium">Pay Per Use</p>
+                <p className="text-xs text-muted-foreground">₹19 for 2.5 credits (1 analysis)</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
             </div>
             <div className="p-5">
               <button className="text-sm font-medium text-primary hover:underline">
-                Upgrade to Pro →
+                Upgrade to Pro (₹99 for 25 credits) →
               </button>
             </div>
           </div>

@@ -10,8 +10,12 @@ import {
   Plus,
   X,
   ArrowRight,
+  CreditCard,
+  Zap as ZapIcon,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const DOMAIN_ICON_MAP: Record<Domain, React.ElementType> = {
   career: Briefcase,
@@ -48,6 +52,8 @@ export function InputFlow() {
     setUserAccount,
   } = useAppStore();
 
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+
   const isValid =
     scenario.trim().length > 10 &&
     domain !== null &&
@@ -56,8 +62,8 @@ export function InputFlow() {
   const handleAnalyze = async () => {
     if (!isValid) return;
 
-    if (userAccount.credits <= 0) {
-      setError("You've run out of credits. Please top up in your profile.");
+    if (userAccount.credits < 2.5) {
+      setShowUpgradePrompt(true);
       return;
     }
 
@@ -96,7 +102,7 @@ export function InputFlow() {
       }
 
       // Deduct credit on success
-      setUserAccount({ credits: userAccount.credits - 1 });
+      setUserAccount({ credits: userAccount.credits - 2.5 });
       setResult(data);
     } catch (err: unknown) {
       const message =
@@ -303,6 +309,84 @@ export function InputFlow() {
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Upgrade Prompt Modal */}
+      {showUpgradePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 text-center border-b border-border">
+              <div className="w-12 h-12 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ZapIcon className="w-6 h-6 text-warning" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Out of Credits!</h2>
+              <p className="text-sm text-muted-foreground">
+                Each analysis requires 2.5 credits. You currently have {userAccount.credits}.
+                Top up your account to continue making confident decisions.
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4 bg-muted/30">
+              {/* Pay Per Use */}
+              <button 
+                className="w-full flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors text-left"
+                onClick={() => setShowUpgradePrompt(false)}
+              >
+                <div>
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Pay Per Use
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">One-time analysis (2.5 credits)</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-bold">₹19</span>
+                </div>
+              </button>
+
+              {/* Pro Plan */}
+              <button 
+                className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-colors text-left relative overflow-hidden"
+                onClick={() => setShowUpgradePrompt(false)}
+              >
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">
+                  Best Value
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Pro Plan <SparklesIcon className="w-3.5 h-3.5 text-primary" />
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-success" /> 25 Credits included
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-bold text-primary">₹99</span>
+                </div>
+              </button>
+            </div>
+            
+            <div className="p-4 border-t border-border flex justify-center bg-card">
+              <button 
+                onClick={() => setShowUpgradePrompt(false)}
+                className="text-sm text-muted-foreground hover:text-foreground font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function SparklesIcon(props: React.ComponentProps<"svg">) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+      <path d="M5 3v4"/>
+      <path d="M19 17v4"/>
+      <path d="M3 5h4"/>
+      <path d="M17 19h4"/>
+    </svg>
+  )
 }

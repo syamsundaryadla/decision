@@ -45,7 +45,7 @@ const initialOptions: OptionInput[] = [
 ];
 
 const defaultUserAccount: UserAccount = {
-  credits: 10,
+  credits: 5,
   subscriptionStatus: "free",
   settings: {
     emailNotifications: true,
