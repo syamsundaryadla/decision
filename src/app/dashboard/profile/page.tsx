@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { useAppStore } from "@/lib/store";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { 
@@ -17,9 +20,23 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const { userAccount, setUserAccount } = useAppStore();
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
   const toggleNotifications = () => {
     setUserAccount({
       settings: {
