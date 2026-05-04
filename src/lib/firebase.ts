@@ -13,8 +13,14 @@ const firebaseConfig = {
 
 // Initialize Firebase only once, but only if we have an API key
 // This prevents build-time crashes on Vercel when env vars are missing
+const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+
+if (typeof window !== "undefined") {
+  console.log("Firebase Init: API Key present?", !!apiKey);
+}
+
 const app = 
-  typeof window !== "undefined" || process.env.NEXT_PUBLIC_FIREBASE_API_KEY
+  typeof window !== "undefined" || apiKey
     ? (getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0])
     : null;
 

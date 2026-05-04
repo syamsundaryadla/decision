@@ -36,11 +36,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Skip if auth is not initialized (placeholder object)
     if (!auth || !auth.onAuthStateChanged) {
+      console.warn("AuthProvider: Auth not initialized (missing API key)");
       setLoading(false);
       return;
     }
 
+    console.log("AuthProvider: Initializing listener");
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log("AuthProvider: State changed, user:", user?.email || "null");
       setUser(user);
       setLoading(false);
     });
@@ -52,9 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("Firebase Auth is not initialized. Check your environment variables.");
     }
     try {
-      await signInWithPopup(auth, googleProvider);
+      console.log("AuthProvider: Starting sign in popup");
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("AuthProvider: Sign in successful", result.user.email);
     } catch (error) {
-      console.error("Sign-in error:", error);
+      console.error("AuthProvider: Sign-in error details:", error);
       throw error;
     }
   };
