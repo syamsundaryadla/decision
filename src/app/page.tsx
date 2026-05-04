@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { Sparkles, ArrowRight, BrainCircuit, Target, Zap, ShieldCheck, BarChart3, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function LandingPage() {
+  const { user, loading } = useAuth();
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden selection:bg-primary/20">
       
@@ -28,18 +30,30 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-4"
           >
-            <Link 
-              href="/login"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-            >
-              Sign In
-            </Link>
-            <Link 
-              href="/login"
-              className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm"
-            >
-              Get Started
-            </Link>
+            {loading ? null : user ? (
+              <Link 
+                href="/dashboard"
+                className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm flex items-center gap-2"
+              >
+                Go to Dashboard
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <>
+                <Link 
+                  href="/login"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/login"
+                  className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </motion.div>
         </div>
       </header>
@@ -87,7 +101,7 @@ export default function LandingPage() {
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
               <Link 
-                href="/login"
+                href={user ? "/dashboard" : "/login"}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium text-lg hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20"
               >
                 Start Simulating
@@ -192,7 +206,7 @@ export default function LandingPage() {
               Join thousands of users who have stopped guessing and started deciding with confidence.
             </p>
             <Link 
-              href="/login"
+              href={user ? "/dashboard" : "/login"}
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium text-lg hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary/20"
             >
               Get Started for Free
