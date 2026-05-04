@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAppStore } from "@/lib/store";
@@ -14,7 +14,9 @@ import {
   MessageSquare,
   ArrowLeft,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  CheckCircle2,
+  Sparkles as SparklesIcon
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -23,6 +25,7 @@ export default function ProfilePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const { userAccount, setUserAccount } = useAppStore();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -96,7 +99,10 @@ export default function ProfilePage() {
             </div>
             <span className="text-lg font-bold tabular-nums">{userAccount.credits}</span>
           </div>
-          <button className="w-full bg-primary text-primary-foreground text-sm font-medium py-2 rounded-xl hover:opacity-90 transition-opacity">
+          <button 
+            onClick={() => setShowSubscriptionModal(true)}
+            className="w-full bg-primary text-primary-foreground text-sm font-medium py-2 rounded-xl hover:opacity-90 transition-opacity"
+          >
             Add Credits
           </button>
         </div>
@@ -110,24 +116,21 @@ export default function ProfilePage() {
             Subscription
           </h2>
           <div className="bg-card border border-border rounded-2xl divide-y divide-border">
-            <div className="p-5 flex items-center justify-between group cursor-pointer hover:bg-muted/30 transition-colors">
+            <div className="p-5 flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium">Current Plan</p>
                 <p className="text-xs text-muted-foreground uppercase tracking-tight">{userAccount.subscriptionStatus}</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
             </div>
-            <div className="p-5 flex items-center justify-between group cursor-pointer hover:bg-muted/30 transition-colors">
+            <div 
+              onClick={() => setShowSubscriptionModal(true)}
+              className="p-5 flex items-center justify-between group cursor-pointer hover:bg-muted/30 transition-colors"
+            >
               <div>
-                <p className="text-sm font-medium">Pay Per Use</p>
-                <p className="text-xs text-muted-foreground">₹15 for 2.5 credits (1 analysis)</p>
+                <p className="text-sm font-medium">Manage Plans & Credits</p>
+                <p className="text-xs text-muted-foreground">View available top-up options</p>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-            </div>
-            <div className="p-5">
-              <button className="text-sm font-medium text-primary hover:underline">
-                Upgrade to Pro (₹99 for 25 credits) →
-              </button>
             </div>
           </div>
         </section>
@@ -196,6 +199,72 @@ export default function ProfilePage() {
           </div>
         </section>
       </div>
+
+      {/* Subscription Modal */}
+      {showSubscriptionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 text-center border-b border-border">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="w-6 h-6 text-primary" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Upgrade Your Plan</h2>
+              <p className="text-sm text-muted-foreground">
+                Choose the plan that fits your decision-making needs.
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4 bg-muted/30">
+              {/* Pay As You Go */}
+              <button 
+                className="w-full flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors text-left"
+                onClick={() => setShowSubscriptionModal(false)}
+              >
+                <div>
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Pay As You Go
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">1 analysis (1 credit)</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-bold">₹9</span>
+                </div>
+              </button>
+
+              {/* Pro Plan */}
+              <button 
+                className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-colors text-left relative overflow-hidden"
+                onClick={() => setShowSubscriptionModal(false)}
+              >
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">
+                  Best Value
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                    Pro Plan <SparklesIcon className="w-3.5 h-3.5 text-primary" />
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-success" /> 15 Analyses included
+                  </p>
+                  <p className="text-[10px] text-success mt-0.5 font-medium">Save 45%</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-bold text-primary">₹99</span>
+                </div>
+              </button>
+            </div>
+            
+            <div className="p-4 border-t border-border flex justify-center bg-card">
+              <button 
+                onClick={() => setShowSubscriptionModal(false)}
+                className="text-sm text-muted-foreground hover:text-foreground font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

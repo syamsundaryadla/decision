@@ -62,7 +62,7 @@ export function InputFlow() {
   const handleAnalyze = async () => {
     if (!isValid) return;
 
-    if (userAccount.credits < 2.5) {
+    if (userAccount.credits < 1) {
       setShowUpgradePrompt(true);
       return;
     }
@@ -102,7 +102,7 @@ export function InputFlow() {
       }
 
       // Deduct credit on success
-      setUserAccount({ credits: userAccount.credits - 2.5 });
+      setUserAccount({ credits: userAccount.credits - 1 });
       setResult(data);
     } catch (err: unknown) {
       const message =
@@ -320,7 +320,7 @@ export function InputFlow() {
               </div>
               <h2 className="text-xl font-bold mb-2">Out of Credits!</h2>
               <p className="text-sm text-muted-foreground">
-                Each analysis requires 2.5 credits. You currently have {userAccount.credits}.
+                Each analysis requires 1 credit. You currently have {userAccount.credits}.
                 Top up your account to continue making confident decisions.
               </p>
             </div>
@@ -333,12 +333,12 @@ export function InputFlow() {
               >
                 <div>
                   <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    Pay Per Use
+                    Pay As You Go
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1">One-time analysis (2.5 credits)</p>
+                  <p className="text-xs text-muted-foreground mt-1">1 analysis (1 credit)</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-bold">₹15</span>
+                  <span className="text-lg font-bold">₹9</span>
                 </div>
               </button>
 
@@ -355,8 +355,9 @@ export function InputFlow() {
                     Pro Plan <SparklesIcon className="w-3.5 h-3.5 text-primary" />
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-success" /> 25 Credits included
+                    <CheckCircle2 className="w-3 h-3 text-success" /> 15 Analyses included
                   </p>
+                  <p className="text-[10px] text-success mt-0.5 font-medium">Save 45%</p>
                 </div>
                 <div className="text-right">
                   <span className="text-lg font-bold text-primary">₹99</span>
