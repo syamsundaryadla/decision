@@ -73,7 +73,7 @@ export default function LandingPage() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50 text-sm text-muted-foreground mb-8"
             >
               <Sparkles className="w-4 h-4 text-primary" />
-              <span>Powered by Gemini 2.0 Flash</span>
+              <span>Powered by Gemini 2.5 Flash</span>
             </motion.div>
             
             <motion.h1 
