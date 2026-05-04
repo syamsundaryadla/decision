@@ -235,30 +235,34 @@ export function ResultsScreen() {
                   </div>
 
                   {/* Pros & Cons */}
-                  <div className="grid grid-cols-2 gap-3 mt-4">
-                    <div>
-                      <p className="text-xs font-medium text-success mb-2">Pros</p>
-                      <ul className="space-y-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
+                    <div className="bg-success/5 rounded-xl p-3 border border-success/10">
+                      <p className="text-xs font-semibold text-success mb-3 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Pros
+                      </p>
+                      <ul className="space-y-2.5">
                         {opt.pros.map((pro, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-1.5 text-xs text-muted-foreground"
+                            className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed"
                           >
-                            <CheckCircle2 className="w-3 h-3 text-success mt-0.5 flex-shrink-0" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-success/40 mt-1 flex-shrink-0" />
                             <span>{pro}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div>
-                      <p className="text-xs font-medium text-destructive mb-2">Cons</p>
-                      <ul className="space-y-1.5">
+                    <div className="bg-destructive/5 rounded-xl p-3 border border-destructive/10">
+                      <p className="text-xs font-semibold text-destructive mb-3 flex items-center gap-1.5">
+                        <XCircle className="w-3.5 h-3.5" /> Cons
+                      </p>
+                      <ul className="space-y-2.5">
                         {opt.cons.map((con, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-1.5 text-xs text-muted-foreground"
+                            className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed"
                           >
-                            <XCircle className="w-3 h-3 text-destructive mt-0.5 flex-shrink-0" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-destructive/40 mt-1 flex-shrink-0" />
                             <span>{con}</span>
                           </li>
                         ))}
