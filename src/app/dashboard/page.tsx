@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { DecisionSimulator } from "@/components/DecisionSimulator";
@@ -65,8 +66,11 @@ export default function DashboardPage() {
                 </button>
               )}
 
-              {/* User avatar */}
-              <div className="flex items-center gap-2 pl-2 border-l border-border">
+              {/* User avatar / Profile Link */}
+              <Link 
+                href="/dashboard/profile"
+                className="flex items-center gap-2 pl-2 border-l border-border hover:bg-muted/50 rounded-lg py-1 px-2 transition-colors"
+              >
                 {user.photoURL && (
                   <img
                     src={user.photoURL}
@@ -78,7 +82,7 @@ export default function DashboardPage() {
                 <span className="text-xs text-muted-foreground hidden md:block max-w-[120px] truncate">
                   {user.displayName?.split(" ")[0]}
                 </span>
-              </div>
+              </Link>
 
               <button
                 onClick={signOut}

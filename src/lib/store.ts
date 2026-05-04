@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Domain, DomainParameter, OptionInput, AnalysisResult, DOMAIN_PARAMETERS } from "./types";
+import type { Domain, DomainParameter, OptionInput, AnalysisResult, DOMAIN_PARAMETERS, UserAccount } from "./types";
 import { DOMAIN_PARAMETERS as PARAMS } from "./types";
 
 interface AppState {
@@ -17,6 +17,9 @@ interface AppState {
 
   // View state
   showResults: boolean;
+  
+  // User state
+  userAccount: UserAccount;
 
   // Actions
   setScenario: (scenario: string) => void;
@@ -30,6 +33,7 @@ interface AppState {
   setLoadingMessage: (message: string) => void;
   setError: (error: string | null) => void;
   setShowResults: (show: boolean) => void;
+  setUserAccount: (account: Partial<UserAccount>) => void;
   reset: () => void;
 }
 
@@ -39,6 +43,15 @@ const initialOptions: OptionInput[] = [
   { id: generateId(), text: "" },
   { id: generateId(), text: "" },
 ];
+
+const defaultUserAccount: UserAccount = {
+  credits: 10,
+  subscriptionStatus: "free",
+  settings: {
+    emailNotifications: true,
+    aiVerbosity: "detailed",
+  },
+};
 
 export const useAppStore = create<AppState>((set) => ({
   scenario: "",
@@ -50,6 +63,7 @@ export const useAppStore = create<AppState>((set) => ({
   loadingMessage: "",
   error: null,
   showResults: false,
+  userAccount: defaultUserAccount,
 
   setScenario: (scenario) => set({ scenario }),
 
@@ -88,6 +102,10 @@ export const useAppStore = create<AppState>((set) => ({
   setLoadingMessage: (loadingMessage) => set({ loadingMessage }),
   setError: (error) => set({ error }),
   setShowResults: (show) => set({ showResults: show }),
+  setUserAccount: (account) =>
+    set((state) => ({
+      userAccount: { ...state.userAccount, ...account },
+    })),
 
   reset: () =>
     set({

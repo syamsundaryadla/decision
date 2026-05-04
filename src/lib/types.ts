@@ -66,3 +66,13 @@ export interface AnalysisResult {
   whyThisWorks: string;
   options: AnalysisOptionResult[];
 }
+
+export interface UserAccount {
+  credits: number;
+  subscriptionStatus: "free" | "pro" | "enterprise";
+  lastBilled?: string;
+  settings: {
+    emailNotifications: boolean;
+    aiVerbosity: "concise" | "detailed";
+  };
+}

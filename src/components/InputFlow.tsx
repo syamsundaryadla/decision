@@ -44,6 +44,8 @@ export function InputFlow() {
     setLoadingMessage,
     setResult,
     setError,
+    userAccount,
+    setUserAccount,
   } = useAppStore();
 
   const isValid =
@@ -53,6 +55,11 @@ export function InputFlow() {
 
   const handleAnalyze = async () => {
     if (!isValid) return;
+
+    if (userAccount.credits <= 0) {
+      setError("You've run out of credits. Please top up in your profile.");
+      return;
+    }
 
     setError(null);
     setIsAnalyzing(true);
@@ -83,6 +90,8 @@ export function InputFlow() {
         throw new Error(data.error || "Analysis failed. Please try again.");
       }
 
+      // Deduct credit on success
+      setUserAccount({ credits: userAccount.credits - 1 });
       setResult(data);
     } catch (err: unknown) {
       const message =
