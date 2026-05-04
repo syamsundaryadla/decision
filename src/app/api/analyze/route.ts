@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+export const maxDuration = 60; // Allow up to 60 seconds for Gemini API response on Vercel
 
 export async function POST(req: NextRequest) {
   try {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
     if (!GEMINI_API_KEY || GEMINI_API_KEY === "your_gemini_api_key_here") {
       return NextResponse.json(
         { error: "Gemini API key is not configured. Please set GEMINI_API_KEY in .env.local" },

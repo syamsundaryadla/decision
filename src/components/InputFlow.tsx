@@ -84,10 +84,15 @@ export function InputFlow() {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        throw new Error(`Server returned an invalid response (${response.status}). This could be a timeout.`);
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Analysis failed. Please try again.");
+        throw new Error(data?.error || `Analysis failed with status ${response.status}.`);
       }
 
       // Deduct credit on success
