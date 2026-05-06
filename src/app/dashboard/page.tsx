@@ -39,15 +39,11 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-[900px] mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between h-14 md:h-16">
+          <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="text-sm font-semibold tracking-tight text-foreground hidden sm:block">
-                Decision Simulator
-              </span>
+            <div className="flex items-center">
+              <img src="/decisely-light.png" alt="Decisely Logo" className="h-12 w-auto object-contain dark:hidden" />
+              <img src="/decisely.png" alt="Decisely Logo" className="h-12 w-auto object-contain hidden dark:block" />
             </div>
 
             {/* Right actions */}

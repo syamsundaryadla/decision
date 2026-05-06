@@ -9,29 +9,28 @@ export default function LandingPage() {
   const { user, loading } = useAuth();
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden selection:bg-primary/20">
-      
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <motion.div 
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex items-center gap-2.5"
           >
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
+            <div className="flex items-center">
+              <img src="/decisely-light.png" alt="Decisely Logo" className="h-16 w-auto object-contain dark:hidden" />
+              <img src="/decisely.png" alt="Decisely Logo" className="h-16 w-auto object-contain hidden dark:block" />
             </div>
-            <span className="font-semibold tracking-tight">DecisionSimulator</span>
           </motion.div>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             className="flex items-center gap-4"
           >
             {loading ? null : user ? (
-              <Link 
+              <Link
                 href="/dashboard"
                 className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm flex items-center gap-2"
               >
@@ -40,13 +39,13 @@ export default function LandingPage() {
               </Link>
             ) : (
               <>
-                <Link 
+                <Link
                   href="/login"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
                 >
                   Sign In
                 </Link>
-                <Link 
+                <Link
                   href="/login"
                   className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm"
                 >
@@ -64,9 +63,9 @@ export default function LandingPage() {
           {/* Background glow effects */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl -z-10" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl -z-10" />
-          
+
           <div className="max-w-7xl mx-auto px-6 text-center">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -75,8 +74,8 @@ export default function LandingPage() {
               <Sparkles className="w-4 h-4 text-primary" />
               <span>Powered by Gemini 2.5 Flash</span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -84,8 +83,8 @@ export default function LandingPage() {
             >
               Make confident decisions with <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">AI precision.</span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -93,21 +92,21 @@ export default function LandingPage() {
             >
               Stop second-guessing. Simulate outcomes, evaluate risks, and get actionable insights for your career, business, and personal life in seconds.
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link 
+              <Link
                 href={user ? "/dashboard" : "/login"}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium text-lg hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20"
               >
                 Start Simulating
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <a 
+              <a
                 href="#features"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full font-medium text-lg border border-border hover:bg-muted/50 transition-colors"
               >
@@ -120,7 +119,7 @@ export default function LandingPage() {
         {/* Features Section */}
         <section id="features" className="py-24 bg-muted/30 border-y border-border/50">
           <div className="max-w-7xl mx-auto px-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -168,7 +167,7 @@ export default function LandingPage() {
                   description: "Remove emotional blindspots with an objective AI that looks purely at the variables you provide."
                 }
               ].map((feature, i) => (
-                <motion.div 
+                <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -192,7 +191,7 @@ export default function LandingPage() {
         {/* CTA Section */}
         <section className="py-32 relative overflow-hidden">
           <div className="absolute inset-0 bg-primary/5" />
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -205,7 +204,7 @@ export default function LandingPage() {
             <p className="text-xl text-muted-foreground mb-10">
               Join thousands of users who have stopped guessing and started deciding with confidence.
             </p>
-            <Link 
+            <Link
               href={user ? "/dashboard" : "/login"}
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium text-lg hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary/20"
             >
@@ -220,8 +219,8 @@ export default function LandingPage() {
       <footer className="border-t border-border/50 bg-background py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Sparkles className="w-4 h-4" />
-            <span className="font-semibold text-foreground">DecisionSimulator</span>
+            <img src="/decisely.png" alt="Decisely Logo" className="w-5 h-5 object-contain" />
+            <span className="font-bold text-foreground">Decisely</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">

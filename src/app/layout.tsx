@@ -4,10 +4,14 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "Decision Simulator AI",
+  title: "Decisely | AI-Powered Decision Intelligence",
   description:
-    "AI-powered decision analysis tool. Simulate outcomes, evaluate risks, and make confident decisions across Career, Finance, Personal, and Business domains.",
-  keywords: ["decision making", "AI", "analysis", "risk assessment", "simulator"],
+    "Decisely is an AI-powered decision analysis tool. Simulate outcomes, evaluate risks, and make confident decisions across Career, Finance, Personal, and Business domains.",
+  keywords: ["decision making", "AI", "analysis", "risk assessment", "simulator", "Decisely"],
+  icons: {
+    icon: "/decisely.png",
+    apple: "/decisely.png",
+  },
 };
 
 export default function RootLayout({

@@ -87,8 +87,18 @@ Important rules:
     if (!geminiResponse.ok) {
       const errorData = await geminiResponse.text();
       console.error("Gemini API error:", errorData);
+      let errorMessage = "Failed to get response from AI.";
+      try {
+        const parsed = JSON.parse(errorData);
+        if (parsed.error && parsed.error.message) {
+          errorMessage = parsed.error.message;
+        }
+      } catch (e) {
+        // use raw text if not json
+        errorMessage = errorData.substring(0, 100);
+      }
       return NextResponse.json(
-        { error: "Failed to get response from AI. Please try again." },
+        { error: `Gemini API Error (${geminiResponse.status}): ${errorMessage}` },
         { status: 502 }
       );
     }
