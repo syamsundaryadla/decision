@@ -12,7 +12,9 @@ import {
   Mail,
   Lock,
   KeyRound,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 type ViewState = "login" | "signup";
@@ -30,6 +32,9 @@ export default function LoginPage() {
   // Form State
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   // OTP State
   const [otpStep, setOtpStep] = useState(false);
@@ -66,6 +71,11 @@ export default function LoginPage() {
         await signInWithEmail(email, password);
         // On success, the useEffect will redirect
       } else {
+        // Signup Flow Step 1: Validate Password Match
+        if (password !== confirmPassword) {
+          throw new Error("Passwords do not match.");
+        }
+
         // Signup Flow Step 1: Request OTP
         const res = await fetch("/api/auth/send-otp", {
           method: "POST",
@@ -176,26 +186,6 @@ export default function LoginPage() {
 
             {!otpStep ? (
               <>
-                {/* View Toggles */}
-                <div className="flex bg-muted/50 p-1 rounded-xl mb-6">
-                  <button
-                    onClick={() => { setView("login"); setError(null); }}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                      view === "login" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Log In
-                  </button>
-                  <button
-                    onClick={() => { setView("signup"); setError(null); }}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                      view === "signup" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Sign Up
-                  </button>
-                </div>
-
                 <form onSubmit={handleMainSubmit} className="space-y-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium">Email address</label>
@@ -217,23 +207,68 @@ export default function LoginPage() {
                     <div className="relative">
                       <Lock className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
 
+                  {view === "signup" && (
+                    <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
+                      <label className="text-sm font-medium">Confirm Password</label>
+                      <div className="relative">
+                        <Lock className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          required
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    disabled={isSubmitting || !email || !password}
+                    disabled={isSubmitting || !email || !password || (view === "signup" && !confirmPassword)}
                     className="w-full bg-primary text-primary-foreground rounded-xl py-3 text-[15px] font-medium hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                   >
-                    {isSubmitting ? "Processing..." : view === "login" ? "Sign In" : "Continue"}
+                    {isSubmitting ? "Processing..." : view === "login" ? "Sign In" : "Create Account"}
                   </button>
+
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => { setView(view === "login" ? "signup" : "login"); setError(null); }}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {view === "login" ? (
+                        <>Don't have an account? <span className="text-primary font-medium">Sign up</span></>
+                      ) : (
+                        <>Already have an account? <span className="text-primary font-medium">Log in</span></>
+                      )}
+                    </button>
+                  </div>
                 </form>
               </>
             ) : (
