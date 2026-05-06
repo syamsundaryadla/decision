@@ -249,8 +249,8 @@ export function ResultsScreen() {
                   <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-success to-emerald-400" />
                 )}
 
-                <div className="p-6 md:p-8 flex-1">
-                  <div className="flex items-start justify-between mb-6">
+                <div className="p-5 md:p-8 flex-1">
+                  <div className="flex items-start justify-between mb-5 md:mb-6">
                     <div className="flex-1 pr-4">
                       {isRecommended && (
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-success/10 text-success text-[11px] font-bold uppercase tracking-wider mb-3 border border-success/20">
@@ -264,9 +264,9 @@ export function ResultsScreen() {
                   </div>
 
                   {/* Metrics Row */}
-                  <div className="grid grid-cols-2 gap-4 mb-8 bg-muted/30 p-4 rounded-2xl border border-border/50">
-                    <div className="col-span-2 sm:col-span-1">
-                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 md:mb-8 bg-muted/30 p-4 rounded-2xl border border-border/50">
+                    <div>
+                      <p className="text-[10px] md:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                         Success Probability
                       </p>
                       <div className="flex items-center gap-3">
@@ -286,20 +286,20 @@ export function ResultsScreen() {
                         />
                       </div>
                     </div>
-                    <div className="col-span-2 sm:col-span-1 flex items-center justify-between sm:justify-end gap-4">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 md:gap-4">
                       <div>
-                        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Risk</p>
+                        <p className="text-[10px] md:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Risk</p>
                         <RiskBadge level={opt.riskLevel} />
                       </div>
                       <div>
-                        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Reward</p>
+                        <p className="text-[10px] md:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Reward</p>
                         <RiskBadge level={opt.rewardLevel} />
                       </div>
                     </div>
                   </div>
 
                   {/* Pros & Cons */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div className="bg-success/5 rounded-2xl p-4 border border-success/10 transition-colors group-hover:bg-success/10">
                       <p className="text-sm font-bold text-success mb-3 flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4" /> Pros

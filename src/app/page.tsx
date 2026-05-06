@@ -99,23 +99,56 @@ export default function LandingPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative pt-24 pb-20 lg:pt-36 lg:pb-32 overflow-hidden">
-          {/* Background glow effects */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-30 pointer-events-none">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-primary/20 blur-[100px] rounded-full" />
+          {/* Background decorative elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-pulse" />
+            <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-[20%] right-[15%] w-[20%] h-[20%] bg-purple-500/10 blur-[80px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+          </div>
+
+          {/* Floating Icons for dynamism */}
+          <div className="absolute inset-0 pointer-events-none hidden lg:block">
+            <motion.div 
+              animate={{ y: [0, -20, 0], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-[15%] left-[10%] text-primary/40"
+            >
+              <BrainCircuit className="w-12 h-12" />
+            </motion.div>
+            <motion.div 
+              animate={{ y: [0, 20, 0], opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute top-[40%] right-[8%] text-blue-500/30"
+            >
+              <Target className="w-16 h-16" />
+            </motion.div>
+            <motion.div 
+              animate={{ x: [0, 15, 0], opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+              className="absolute bottom-[20%] left-[15%] text-purple-500/30"
+            >
+              <Zap className="w-10 h-10" />
+            </motion.div>
+            <motion.div 
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-[60%] left-[5%] text-primary/20"
+            >
+              <Sparkles className="w-8 h-8" />
+            </motion.div>
           </div>
           
           <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
-
             
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 max-w-4xl mx-auto leading-[1.1] text-balance"
+              className="text-5xl sm:text-6xl md:text-8xl font-bold tracking-tighter mb-6 md:mb-8 max-w-5xl mx-auto leading-[0.95] text-balance"
             >
-              Decide with confidence. <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-500 to-purple-500">
-                Backed by data.
+              The most intelligent way to <br className="hidden md:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-600 to-purple-600">
+                make big decisions.
               </span>
             </motion.h1>
             
@@ -123,69 +156,118 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed text-balance"
+              className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed text-balance font-light px-4 md:px-0"
             >
-              Stop relying on gut feelings. Decisely analyzes your choices, simulates outcomes, and calculates risk-to-reward ratios in seconds.
+              Decisely uses advanced AI to model scenarios, identify blind spots, and simulate outcomes—turning uncertainty into calculated strategy.
             </motion.p>
             
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24"
             >
               <Link 
                 href={user ? "/dashboard" : "/login"}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-medium text-lg hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-10 py-5 rounded-full font-medium text-xl hover:opacity-90 active:scale-95 transition-all shadow-2xl shadow-primary/30"
               >
-                Try for Free
-                <ArrowRight className="w-5 h-5" />
+                Get Started
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a 
                 href="#how-it-works"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full font-medium text-lg border border-border hover:bg-muted/50 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 rounded-full font-medium text-xl border border-border bg-background/50 backdrop-blur-sm hover:bg-muted/80 transition-all"
               >
-                How it works
+                Watch Demo
               </a>
             </motion.div>
 
             {/* Product Mockup Preview */}
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="relative mx-auto max-w-5xl rounded-xl border border-border/50 bg-background/50 p-2 backdrop-blur-sm shadow-2xl"
+              initial={{ opacity: 0, y: 60, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="relative mx-auto max-w-5xl rounded-2xl border border-border/50 bg-background/30 p-3 backdrop-blur-xl shadow-[0_0_100px_rgba(0,0,0,0.1)] dark:shadow-[0_0_100px_rgba(255,255,255,0.05)]"
             >
-              <div className="rounded-lg border border-border bg-card overflow-hidden">
-                <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-3">
-                  <div className="flex gap-1.5">
-                    <div className="h-3 w-3 rounded-full bg-destructive/80" />
-                    <div className="h-3 w-3 rounded-full bg-warning/80" />
-                    <div className="h-3 w-3 rounded-full bg-success/80" />
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-50 z-[-1]" />
+              
+              <div className="rounded-xl border border-border bg-card/80 overflow-hidden shadow-sm">
+                <div className="flex items-center justify-between border-b border-border bg-muted/50 px-5 py-4">
+                  <div className="flex gap-2">
+                    <div className="h-3 w-3 rounded-full bg-[#FF5F57] shadow-inner" />
+                    <div className="h-3 w-3 rounded-full bg-[#FFBD2E] shadow-inner" />
+                    <div className="h-3 w-3 rounded-full bg-[#28C840] shadow-inner" />
                   </div>
-                  <div className="ml-4 text-xs font-medium text-muted-foreground">app.decisely.ai/analyze</div>
+                  <div className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase opacity-50">Intelligence Interface</div>
+                  <div className="w-12" /> {/* Spacer */}
                 </div>
-                <div className="p-6 md:p-10 text-left bg-card grid md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <div className="h-8 w-3/4 bg-muted rounded-md animate-pulse" />
-                    <div className="h-4 w-full bg-muted/50 rounded-md animate-pulse" />
-                    <div className="h-4 w-5/6 bg-muted/50 rounded-md animate-pulse" />
-                    <div className="space-y-2 pt-4">
-                      <div className="flex justify-between items-center p-3 border border-border rounded-lg">
-                        <span className="text-sm font-medium">Option A: Take new offer</span>
-                        <span className="text-xs text-success bg-success/10 px-2 py-1 rounded">78% Match</span>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border border-border rounded-lg opacity-60">
-                        <span className="text-sm font-medium">Option B: Stay at current job</span>
-                        <span className="text-xs text-warning bg-warning/10 px-2 py-1 rounded">42% Match</span>
-                      </div>
+                
+                <div className="p-6 md:p-10 text-left grid md:grid-cols-12 gap-8 md:gap-10">
+                  <div className="md:col-span-7 space-y-6 md:space-y-8">
+                    <div className="space-y-3">
+                      <div className="h-8 md:h-10 w-4/5 bg-gradient-to-r from-muted to-muted/30 rounded-lg" />
+                      <div className="h-3 md:h-4 w-full bg-muted/40 rounded-md" />
+                      <div className="h-3 md:h-4 w-2/3 bg-muted/40 rounded-md" />
+                    </div>
+                    
+                    <div className="grid gap-3 md:gap-4">
+                      {[
+                        { label: "High Growth Path", score: 88, color: "bg-primary" },
+                        { label: "Safety First Strategy", score: 62, color: "bg-blue-500" },
+                        { label: "Status Quo", score: 34, color: "bg-muted-foreground/30" }
+                      ].map((item, i) => (
+                        <div key={i} className="p-3 md:p-4 rounded-xl border border-border bg-background/50 flex items-center justify-between group hover:border-primary/50 transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className={`h-10 w-10 rounded-full ${item.color}/10 flex items-center justify-center text-primary`}>
+                              {i === 0 ? <Zap className="w-5 h-5 text-primary" /> : <Target className="w-5 h-5 text-muted-foreground" />}
+                            </div>
+                            <span className="font-semibold">{item.label}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="h-2 w-24 bg-muted rounded-full overflow-hidden hidden sm:block">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${item.score}%` }}
+                                transition={{ duration: 1, delay: 1 + i * 0.2 }}
+                                className={`h-full ${item.color}`}
+                              />
+                            </div>
+                            <span className="text-sm font-bold">{item.score}%</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <div className="hidden md:flex flex-col items-center justify-center border-l border-border pl-8 relative">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent rounded-lg" />
-                    <Target className="w-16 h-16 text-primary mb-4" />
-                    <div className="text-2xl font-bold">Clear Winner</div>
-                    <p className="text-sm text-muted-foreground text-center mt-2">Option A aligns 3x better with your long-term growth parameters.</p>
+                  
+                  <div className="md:col-span-5 flex flex-col items-center justify-center bg-muted/20 rounded-2xl p-8 border border-border/50 relative overflow-hidden group">
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                    >
+                      <div className="absolute inset-0 border-[40px] border-dashed border-primary rounded-full scale-150" />
+                    </motion.div>
+                    
+                    <div className="relative z-10 text-center">
+                      <div className="mb-6 inline-flex p-4 rounded-full bg-primary/10 text-primary shadow-inner">
+                        <BrainCircuit className="w-10 h-10" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">Optimal Outcome Found</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Based on your 12 unique parameters, the <span className="text-primary font-bold">High Growth Path</span> yields the highest 5-year ROI while maintaining an acceptable risk profile.
+                      </p>
+                      
+                      <div className="mt-8 pt-8 border-t border-border/50 w-full grid grid-cols-2 gap-4 text-xs font-mono">
+                        <div className="text-left">
+                          <div className="text-muted-foreground uppercase mb-1">Risk Score</div>
+                          <div className="text-primary font-bold">LOW (14%)</div>
+                        </div>
+                        <div className="text-left">
+                          <div className="text-muted-foreground uppercase mb-1">Confidence</div>
+                          <div className="text-primary font-bold">98.4%</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
