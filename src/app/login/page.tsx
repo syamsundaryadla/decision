@@ -14,13 +14,14 @@ import {
   KeyRound,
   AlertCircle,
   Eye,
-  EyeOff
+  EyeOff,
+  CheckCircle2
 } from "lucide-react";
 
-type ViewState = "login" | "signup";
+type ViewState = "login" | "signup" | "forgot-password";
 
 export default function LoginPage() {
-  const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const { user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword } = useAuth();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   
@@ -28,6 +29,7 @@ export default function LoginPage() {
   const [view, setView] = useState<ViewState>("login");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   // Form State
   const [email, setEmail] = useState("");
@@ -39,6 +41,7 @@ export default function LoginPage() {
   // OTP State
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -50,9 +53,20 @@ export default function LoginPage() {
     }
   }, [user, loading, router]);
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      timer = setInterval(() => {
+        setResendCooldown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
     setError(null);
+    setSuccess(null);
     try {
       await signInWithGoogle();
     } catch (err: any) {
@@ -64,32 +78,53 @@ export default function LoginPage() {
   const handleMainSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setIsSubmitting(true);
 
     try {
       if (view === "login") {
         await signInWithEmail(email, password);
-        // On success, the useEffect will redirect
-      } else {
-        // Signup Flow Step 1: Validate Password Match
+      } else if (view === "signup") {
         if (password !== confirmPassword) {
           throw new Error("Passwords do not match.");
         }
-
-        // Signup Flow Step 1: Request OTP
-        const res = await fetch("/api/auth/send-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed to send OTP");
-        
-        setOtpStep(true);
+        await sendOtp();
+      } else if (view === "forgot-password") {
+        await resetPassword(email);
+        setSuccess("Password reset link sent to your email!");
+        setView("login");
       }
     } catch (err: any) {
       setError(err.message || "An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const sendOtp = async () => {
+    const res = await fetch("/api/auth/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to send OTP");
+    
+    setOtpStep(true);
+    setResendCooldown(60);
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await sendOtp();
+      setSuccess("New code sent!");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err: any) {
+      setError(err.message || "Failed to resend code.");
     } finally {
       setIsSubmitting(false);
     }
@@ -101,7 +136,6 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      // Step 2: Verify OTP
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,9 +145,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Invalid OTP code");
 
-      // Step 3: Create Firebase Account
       await signUpWithEmail(email, password);
-      // On success, useEffect redirects to dashboard
     } catch (err: any) {
       setError(err.message || "Verification failed.");
       setIsSubmitting(false);
@@ -132,13 +164,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
-      {/* Background Gradients */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/5 blur-3xl" />
       </div>
 
-      {/* Theme toggle */}
       {mounted && (
         <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10">
           <button
@@ -146,33 +176,29 @@ export default function LoginPage() {
             className="p-2.5 rounded-xl bg-card border border-border hover:bg-muted transition-all duration-200"
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? (
-              <Sun className="w-4 h-4 text-foreground" />
-            ) : (
-              <Moon className="w-4 h-4 text-foreground" />
-            )}
+            {theme === "dark" ? <Sun className="w-4 h-4 text-foreground" /> : <Moon className="w-4 h-4 text-foreground" />}
           </button>
         </div>
       )}
 
-      {/* Main content */}
       <main className="flex-1 flex items-center justify-center px-5 py-12 md:py-20">
         <div className="w-full max-w-[440px] mx-auto">
-          {/* Logo / Brand */}
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center justify-center mb-6 hover:opacity-80 transition-opacity">
               <img src="/decisely-light.png" alt="Decisely Logo" className="h-12 w-auto object-contain dark:hidden" />
               <img src="/decisely.png" alt="Decisely Logo" className="h-10 w-auto object-contain hidden dark:block" />
             </Link>
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2">
-              {otpStep ? "Verify your email" : view === "login" ? "Welcome back" : "Create an account"}
+              {otpStep ? "Verify your email" : view === "login" ? "Welcome back" : view === "signup" ? "Create an account" : "Reset Password"}
             </h1>
             <p className="text-sm text-muted-foreground">
               {otpStep 
                 ? `We sent a code to ${email}`
                 : view === "login" 
                   ? "Enter your details to access your account." 
-                  : "Start making confident, data-backed decisions."}
+                  : view === "signup"
+                    ? "Start making confident, data-backed decisions."
+                    : "Enter your email to receive a reset link."}
             </p>
           </div>
 
@@ -183,27 +209,45 @@ export default function LoginPage() {
                 <p className="text-sm text-destructive leading-relaxed">{error}</p>
               </div>
             )}
+            
+            {success && (
+              <div className="mb-6 p-4 rounded-xl bg-success/10 border border-success/20 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
+                <p className="text-sm text-success leading-relaxed">{success}</p>
+              </div>
+            )}
 
             {!otpStep ? (
-              <>
-                <form onSubmit={handleMainSubmit} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Email address</label>
-                    <div className="relative">
-                      <Mail className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                      <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                      />
-                    </div>
+              <form onSubmit={handleMainSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Email address</label>
+                  <div className="relative">
+                    <Mail className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    />
                   </div>
+                </div>
 
+                {view !== "forgot-password" && (
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Password</label>
+                    <div className="flex justify-between items-center">
+                      <label className="text-sm font-medium">Password</label>
+                      {view === "login" && (
+                        <button
+                          type="button"
+                          onClick={() => setView("forgot-password")}
+                          className="text-xs text-primary font-medium hover:underline"
+                        >
+                          Forgot password?
+                        </button>
+                      )}
+                    </div>
                     <div className="relative">
                       <Lock className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       <input
@@ -223,54 +267,56 @@ export default function LoginPage() {
                       </button>
                     </div>
                   </div>
+                )}
 
-                  {view === "signup" && (
-                    <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
-                      <label className="text-sm font-medium">Confirm Password</label>
-                      <div className="relative">
-                        <Lock className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          required
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
+                {view === "signup" && (
+                  <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
+                    <label className="text-sm font-medium">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || !email || !password || (view === "signup" && !confirmPassword)}
-                    className="w-full bg-primary text-primary-foreground rounded-xl py-3 text-[15px] font-medium hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-                  >
-                    {isSubmitting ? "Processing..." : view === "login" ? "Sign In" : "Create Account"}
-                  </button>
-
-                  <div className="text-center pt-2">
-                    <button
-                      type="button"
-                      onClick={() => { setView(view === "login" ? "signup" : "login"); setError(null); }}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {view === "login" ? (
-                        <>Don't have an account? <span className="text-primary font-medium">Sign up</span></>
-                      ) : (
-                        <>Already have an account? <span className="text-primary font-medium">Log in</span></>
-                      )}
-                    </button>
                   </div>
-                </form>
-              </>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !email || (view !== "forgot-password" && !password) || (view === "signup" && !confirmPassword)}
+                  className="w-full bg-primary text-primary-foreground rounded-xl py-3 text-[15px] font-medium hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                >
+                  {isSubmitting ? "Processing..." : view === "login" ? "Sign In" : view === "signup" ? "Create Account" : "Send Reset Link"}
+                </button>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setView(view === "login" ? "signup" : "login"); setError(null); setSuccess(null); }}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {view === "login" ? (
+                      <>Don't have an account? <span className="text-primary font-medium">Sign up</span></>
+                    ) : view === "signup" ? (
+                      <>Already have an account? <span className="text-primary font-medium">Log in</span></>
+                    ) : (
+                      <><span className="text-primary font-medium">Back to login</span></>
+                    )}
+                  </button>
+                </div>
+              </form>
             ) : (
               <form onSubmit={handleOtpVerify} className="space-y-4">
                 <div className="space-y-1.5">
@@ -287,9 +333,19 @@ export default function LoginPage() {
                       className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-xl text-lg tracking-[0.5em] font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Please check your spam folder if you don't see it.
-                  </p>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-muted-foreground">
+                      Didn't get the code?
+                    </p>
+                    <button
+                      type="button"
+                      disabled={resendCooldown > 0 || isSubmitting}
+                      onClick={handleResendOtp}
+                      className="text-xs font-medium text-primary hover:underline disabled:opacity-50 disabled:no-underline"
+                    >
+                      {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Code"}
+                    </button>
+                  </div>
                 </div>
 
                 <button
@@ -302,7 +358,7 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  onClick={() => { setOtpStep(false); setOtp(""); setError(null); }}
+                  onClick={() => { setOtpStep(false); setOtp(""); setError(null); setSuccess(null); }}
                   className="w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Back
@@ -310,7 +366,7 @@ export default function LoginPage() {
               </form>
             )}
 
-            {!otpStep && (
+            {!otpStep && view !== "forgot-password" && (
               <>
                 <div className="flex items-center gap-3 my-6">
                   <div className="flex-1 h-px bg-border" />

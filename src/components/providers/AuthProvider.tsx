@@ -13,6 +13,7 @@ import {
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword as firebaseCreateUserWithEmailAndPassword,
   signInWithEmailAndPassword as firebaseSignInWithEmailAndPassword,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   type User,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
@@ -23,6 +24,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -32,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({
   signInWithGoogle: async () => {},
   signUpWithEmail: async () => {},
   signInWithEmail: async () => {},
+  resetPassword: async () => {},
   signOut: async () => {},
 });
 
@@ -80,6 +83,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await firebaseSignInWithEmailAndPassword(auth, email, pass);
   };
 
+  const resetPassword = async (email: string) => {
+    if (!auth) throw new Error("Auth not initialized");
+    await firebaseSendPasswordResetEmail(auth, email);
+  };
+
   const signOut = async () => {
     if (!auth || !auth.onAuthStateChanged) return;
     try {
@@ -91,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, resetPassword, signOut }}>
       {children}
     </AuthContext.Provider>
   );
