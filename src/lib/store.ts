@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Domain, DomainParameter, OptionInput, AnalysisResult, DOMAIN_PARAMETERS, UserAccount } from "./types";
+import type { Domain, DomainParameter, OptionInput, AnalysisResult, DOMAIN_PARAMETERS, UserAccount, DecisionQuestion, UserAnswer } from "./types";
 import { DOMAIN_PARAMETERS as PARAMS } from "./types";
 
 interface AppState {
@@ -17,6 +17,11 @@ interface AppState {
 
   // View state
   showResults: boolean;
+  currentStep: "input" | "questionnaire" | "results";
+  
+  // Questionnaire state
+  questions: DecisionQuestion[];
+  answers: UserAnswer[];
   
   // User state
   userAccount: UserAccount;
@@ -33,6 +38,9 @@ interface AppState {
   setLoadingMessage: (message: string) => void;
   setError: (error: string | null) => void;
   setShowResults: (show: boolean) => void;
+  setCurrentStep: (step: "input" | "questionnaire" | "results") => void;
+  setQuestions: (questions: DecisionQuestion[]) => void;
+  setAnswers: (answers: UserAnswer[]) => void;
   setUserAccount: (account: Partial<UserAccount>) => void;
   reset: () => void;
 }
@@ -63,6 +71,9 @@ export const useAppStore = create<AppState>((set) => ({
   loadingMessage: "",
   error: null,
   showResults: false,
+  currentStep: "input",
+  questions: [],
+  answers: [],
   userAccount: defaultUserAccount,
 
   setScenario: (scenario) => set({ scenario }),
@@ -102,6 +113,9 @@ export const useAppStore = create<AppState>((set) => ({
   setLoadingMessage: (loadingMessage) => set({ loadingMessage }),
   setError: (error) => set({ error }),
   setShowResults: (show) => set({ showResults: show }),
+  setCurrentStep: (step) => set({ currentStep: step }),
+  setQuestions: (questions) => set({ questions }),
+  setAnswers: (answers) => set({ answers }),
   setUserAccount: (account) =>
     set((state) => ({
       userAccount: { ...state.userAccount, ...account },
@@ -121,5 +135,8 @@ export const useAppStore = create<AppState>((set) => ({
       loadingMessage: "",
       error: null,
       showResults: false,
+      currentStep: "input",
+      questions: [],
+      answers: [],
     }),
 }));

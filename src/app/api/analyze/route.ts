@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { scenario, domain, options, parameters } = body;
+    const { mode = "final-analysis", scenario, domain, options, parameters, answers } = body;
 
     if (!scenario || !domain || !options || options.length < 2) {
       return NextResponse.json(
@@ -32,7 +32,40 @@ export async function POST(req: NextRequest) {
       .map((o: { text: string }, i: number) => `Option ${i + 1}: ${o.text}`)
       .join("\n");
 
-    const prompt = `You are a world-class Decision Scientist and Chief Strategy Officer. Your task is to analyze the following decision scenario and provide a highly rigorous, objective, and data-driven analysis. 
+    let prompt = "";
+
+    if (mode === "generate-questions") {
+      prompt = `You are a world-class Decision Scientist consulting a client. 
+They have a scenario but might have blind spots. Generate exactly 2 to 3 insightful, multiple-choice questions to ask the user to clarify their specific context, risk tolerance, or unknown variables.
+
+**Domain:** ${domain}
+**Scenario:** ${scenario}
+**Options:**
+${optionsList}
+**Stated Parameters:** ${parameterContext || "Default values"}
+
+Respond ONLY with valid JSON in this exact format (an array of objects):
+[
+  {
+    "id": "q1",
+    "text": "The text of the clarifying question?",
+    "options": ["Option A", "Option B", "Option C", "Option D"]
+  }
+]
+
+Important rules:
+- Provide exactly 2 or 3 questions.
+- Each question MUST have exactly 4 options.
+- Options must be distinct, actionable choices (not just "Yes/No").
+- Do not output anything outside of the JSON array.`;
+    } else {
+      // final-analysis mode
+      let answersContext = "None provided.";
+      if (answers && answers.length > 0) {
+        answersContext = answers.map((a: any) => `Q: ${a.questionText}\nA: ${a.answer}`).join("\n\n");
+      }
+
+      prompt = `You are a world-class Decision Scientist and Chief Strategy Officer. Your task is to analyze the following decision scenario and provide a highly rigorous, objective, and data-driven analysis. 
 
 **Domain / Industry Context:** ${domain}
 **The Core Scenario:** ${scenario}
@@ -42,10 +75,13 @@ ${optionsList}
 
 **User Parameters (Weight these heavily in your evaluation):** ${parameterContext || "Default values"}
 
+**User's Clarifying Context (Crucial additional insights directly from the user):**
+${answersContext}
+
 ### Analysis Directives:
 1. **Rigor & Logic**: Apply established decision-making frameworks (e.g., Cost-Benefit Analysis, Expected Value, Second-Order Effects). Look beyond the obvious.
 2. **Trade-offs**: Explicitly evaluate the trade-offs of each option. What are the hidden costs or risks?
-3. **Parameter Alignment**: The 'User Parameters' dictate what the user values most. Your final recommendation MUST strongly align with these specific parameters.
+3. **Parameter Alignment**: The 'User Parameters' AND their 'Clarifying Context' dictate what the user values most. Your final recommendation MUST strongly align with these.
 4. **Actionable Insights**: Provide a profound, non-obvious insight that shifts how the user thinks about this problem.
 
 Respond ONLY with valid JSON in this exact format (no markdown, no code fences, no extra text):
@@ -73,6 +109,7 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
 - Each option MUST have exactly 3 pros and 3 cons. Ensure they are specific, not generic filler.
 - You MUST provide analysis for EVERY option provided in the prompt.
 - Do not output anything outside of the JSON structure.`;
+    }
 
     const geminiResponse = await fetch(GEMINI_URL, {
       method: "POST",
@@ -123,13 +160,13 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
 
     // Clean the response - strip markdown code fences if present
     let cleanedText = textContent.trim();
-    if (cleanedText.startsWith("```")) {
-      cleanedText = cleanedText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+    if (cleanedText.startsWith("\`\`\`")) {
+      cleanedText = cleanedText.replace(/^\`\`\`(?:json)?\n?/, "").replace(/\n?\`\`\`$/, "");
     }
 
-    let analysisResult;
+    let parsedResult;
     try {
-      analysisResult = JSON.parse(cleanedText);
+      parsedResult = JSON.parse(cleanedText);
     } catch {
       console.error("Failed to parse Gemini JSON:", cleanedText);
       return NextResponse.json(
@@ -138,15 +175,24 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
       );
     }
 
-    // Validate structure
-    if (!analysisResult.recommendation || !analysisResult.options || !Array.isArray(analysisResult.options)) {
-      return NextResponse.json(
-        { error: "AI returned incomplete analysis. Please try again." },
-        { status: 502 }
-      );
+    if (mode === "generate-questions") {
+      if (!Array.isArray(parsedResult)) {
+        return NextResponse.json(
+          { error: "AI failed to generate valid questions. Please try again." },
+          { status: 502 }
+        );
+      }
+      return NextResponse.json(parsedResult);
+    } else {
+      // Validate final analysis structure
+      if (!parsedResult.recommendation || !parsedResult.options || !Array.isArray(parsedResult.options)) {
+        return NextResponse.json(
+          { error: "AI returned incomplete analysis. Please try again." },
+          { status: 502 }
+        );
+      }
+      return NextResponse.json(parsedResult);
     }
-
-    return NextResponse.json(analysisResult);
   } catch (error) {
     console.error("API route error:", error);
     return NextResponse.json(

@@ -67,6 +67,18 @@ export interface AnalysisResult {
   options: AnalysisOptionResult[];
 }
 
+export interface DecisionQuestion {
+  id: string;
+  text: string;
+  options: string[]; // up to 4 options
+}
+
+export interface UserAnswer {
+  questionId: string;
+  questionText: string;
+  answer: string;
+}
+
 export interface UserAccount {
   credits: number;
   subscriptionStatus: "free" | "pro" | "enterprise";

@@ -1,6 +1,9 @@
 "use client";
 
 import { useAppStore } from "@/lib/store";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { DOMAIN_LABELS, type Domain } from "@/lib/types";
 import {
   Briefcase,
@@ -34,23 +37,22 @@ const LOADING_MESSAGES = [
 export function InputFlow() {
   const {
     scenario,
-    domain,
-    options,
-    parameters,
-    error,
     setScenario,
+    domain,
     setDomain,
+    options,
     addOption,
-    removeOption,
     updateOption,
+    removeOption,
+    parameters,
     updateParameter,
-    setIsAnalyzing,
-    setLoadingMessage,
-    setResult,
-    setError,
+    setQuestions,
+    setCurrentStep,
     userAccount,
     setUserAccount,
   } = useAppStore();
+
+  const { user } = useAuth();
 
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
@@ -83,6 +85,7 @@ export function InputFlow() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          mode: "generate-questions",
           scenario,
           domain,
           options: options.filter((o) => o.text.trim().length > 0),
@@ -94,16 +97,16 @@ export function InputFlow() {
       try {
         data = await response.json();
       } catch (e) {
-        throw new Error(`Server returned an invalid response (${response.status}). This could be a timeout.`);
+        throw new Error(`Server returned an invalid response (${response.status}).`);
       }
 
       if (!response.ok) {
         throw new Error(data?.error || `Analysis failed with status ${response.status}.`);
       }
 
-      // Deduct credit on success
-      setUserAccount({ credits: userAccount.credits - 1 });
-      setResult(data);
+      // Instead of setting result, we set questions and move to questionnaire
+      setQuestions(data);
+      setCurrentStep("questionnaire");
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Network error. Please check your connection.";
@@ -278,17 +281,17 @@ export function InputFlow() {
       <div className="hidden md:block">
         <button
           onClick={handleAnalyze}
-          disabled={!isValid}
+          disabled={!isValid || isAnalyzing}
           id="analyze-button-desktop"
           className={cn(
             "inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-medium transition-all duration-200",
-            isValid
+            isValid && !isAnalyzing
               ? "bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] shadow-sm"
               : "bg-muted text-muted-foreground cursor-not-allowed"
           )}
         >
-          Analyze Decision
-          <ArrowRight className="w-4 h-4" />
+          {isAnalyzing ? "Preparing Analysis..." : "Start Analysis"}
+          {!isAnalyzing && <ArrowRight className="w-4 h-4" />}
         </button>
       </div>
 
@@ -296,17 +299,17 @@ export function InputFlow() {
       <div className="fixed bottom-0 left-0 right-0 md:hidden bg-background/80 backdrop-blur-xl border-t border-border p-4 z-40">
         <button
           onClick={handleAnalyze}
-          disabled={!isValid}
+          disabled={!isValid || isAnalyzing}
           id="analyze-button-mobile"
           className={cn(
             "w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-medium transition-all duration-200 min-h-[48px]",
-            isValid
+            isValid && !isAnalyzing
               ? "bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] shadow-sm"
               : "bg-muted text-muted-foreground cursor-not-allowed"
           )}
         >
-          Analyze Decision
-          <ArrowRight className="w-4 h-4" />
+          {isAnalyzing ? "Preparing Analysis..." : "Start Analysis"}
+          {!isAnalyzing && <ArrowRight className="w-4 h-4" />}
         </button>
       </div>
 

@@ -14,9 +14,11 @@ import {
   Shield,
   RotateCcw,
   Sparkles,
-  Target
+  Target,
+  Download,
+  Loader2
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 function ProgressBar({
   value,
@@ -61,8 +63,43 @@ function RiskBadge({ level }: { level: string }) {
 export function ResultsScreen() {
   const { result, reset, setShowResults } = useAppStore();
   const [expandedOptions, setExpandedOptions] = useState<Set<number>>(new Set());
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   if (!result) return null;
+
+  const handleDownloadPdf = async () => {
+    if (!pdfRef.current) return;
+    setIsGeneratingPdf(true);
+    
+    try {
+      // Dynamically import to avoid SSR issues
+      // @ts-ignore
+      const html2pdf = (await import('html2pdf.js')).default;
+      const element = pdfRef.current;
+      
+      // Temporarily hide the action buttons for the PDF
+      const actionButtons = element.querySelector('#action-buttons');
+      if (actionButtons) (actionButtons as HTMLElement).style.display = 'none';
+
+      const opt = {
+        margin:       15,
+        filename:     'decisely-analysis.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      await html2pdf().set(opt).from(element).save();
+      
+      // Restore action buttons
+      if (actionButtons) (actionButtons as HTMLElement).style.display = 'flex';
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   const toggleExpand = (index: number) => {
     setExpandedOptions((prev) => {
@@ -85,9 +122,9 @@ export function ResultsScreen() {
   };
 
   return (
-    <div className="space-y-6 md:space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div ref={pdfRef} className="space-y-6 md:space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 bg-background">
       {/* Header Actions */}
-      <div className="flex items-center justify-between">
+      <div id="action-buttons" className="flex flex-wrap items-center justify-between gap-4">
         <button
           onClick={handleBack}
           className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200 bg-card hover:bg-muted border border-border px-4 py-2 rounded-xl shadow-sm"
@@ -96,14 +133,24 @@ export function ResultsScreen() {
           <ArrowLeft className="w-4 h-4" />
           Edit Inputs
         </button>
-        <button
-          onClick={handleNewDecision}
-          className="flex items-center gap-2 text-sm font-medium text-primary-foreground bg-primary hover:opacity-90 transition-all duration-200 px-4 py-2 rounded-xl shadow-sm shadow-primary/20"
-          id="new-decision-button"
-        >
-          <RotateCcw className="w-4 h-4" />
-          New Decision
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadPdf}
+            disabled={isGeneratingPdf}
+            className="flex items-center gap-2 text-sm font-medium text-foreground bg-card hover:bg-muted border border-border px-4 py-2 rounded-xl shadow-sm transition-all duration-200 disabled:opacity-50"
+          >
+            {isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            <span className="hidden sm:inline">Save PDF</span>
+          </button>
+          <button
+            onClick={handleNewDecision}
+            className="flex items-center gap-2 text-sm font-medium text-primary-foreground bg-primary hover:opacity-90 transition-all duration-200 px-4 py-2 rounded-xl shadow-sm shadow-primary/20"
+            id="new-decision-button"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span className="hidden sm:inline">New Decision</span>
+          </button>
+        </div>
       </div>
 
       <div className="text-center space-y-2 mb-8">

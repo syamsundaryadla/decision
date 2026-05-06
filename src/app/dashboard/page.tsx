@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { DecisionSimulator } from "@/components/DecisionSimulator";
-import { LogOut, Sun, Moon, Sparkles } from "lucide-react";
+import { LogOut, Sun, Moon, Sparkles, Clock } from "lucide-react";
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
@@ -48,6 +48,14 @@ export default function DashboardPage() {
 
             {/* Right actions */}
             <div className="flex items-center gap-2">
+              <Link
+                href="/dashboard/history"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <Clock className="w-4 h-4" />
+                History
+              </Link>
+              
               {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
