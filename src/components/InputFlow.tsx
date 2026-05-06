@@ -18,6 +18,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { auth } from "@/lib/firebase";
 import { useState } from "react";
 
 const DOMAIN_ICON_MAP: Record<Domain, React.ElementType> = {
@@ -86,9 +87,18 @@ export function InputFlow() {
     }, 2500);
 
     try {
+      // Get the current user's ID token for server-side auth verification
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        throw new Error("Please sign in to use the analysis feature.");
+      }
+
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           mode: "generate-questions",
           scenario,

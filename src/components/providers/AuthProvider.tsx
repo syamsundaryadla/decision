@@ -50,9 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    console.log("AuthProvider: Initializing listener");
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log("AuthProvider: State changed, user:", user?.email || "null");
       setUser(user);
       setLoading(false);
     });
@@ -64,9 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("Firebase Auth is not initialized. Check your environment variables.");
     }
     try {
-      console.log("AuthProvider: Starting sign in popup");
       const result = await signInWithPopup(auth, googleProvider);
-      console.log("AuthProvider: Sign in successful", result.user.email);
     } catch (error) {
       console.error("AuthProvider: Sign-in error details:", error);
       throw error;

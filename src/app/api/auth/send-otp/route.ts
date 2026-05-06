@@ -1,15 +1,42 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const OTP_SECRET = process.env.OTP_SECRET || 'default_fallback_secret_decisely';
+
+// [VULN-004 FIX] Fail hard if OTP_SECRET is missing — no insecure fallback
+const OTP_SECRET = process.env.OTP_SECRET;
+if (!OTP_SECRET) {
+  console.error('CRITICAL: OTP_SECRET environment variable is not set. OTP verification will fail.');
+}
 
 export async function POST(req: Request) {
   try {
+    // [VULN-003 FIX] Rate limit: max 3 OTP sends per minute per IP
+    const ip = getClientIp(req);
+    const rateCheck = checkRateLimit(`otp-send:${ip}`, {
+      maxRequests: 3,
+      windowSeconds: 60,
+    });
+
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait before requesting another code.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((rateCheck.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
+    if (!OTP_SECRET) {
+      return NextResponse.json(
+        { error: 'Server configuration error. Please contact support.' },
+        { status: 500 }
+      );
+    }
+
     const { email } = await req.json();
 
-    if (!email) {
+    if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
@@ -17,13 +44,13 @@ export async function POST(req: Request) {
       console.warn("RESEND_API_KEY is missing. In development, we will mock the OTP.");
     }
 
-    // Generate 6 digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // [VULN-001 FIX] Use cryptographically secure random for OTP generation
+    const otp = crypto.randomInt(100000, 999999).toString();
     
     // Set expiration to 10 minutes from now
     const expiresAt = Date.now() + 10 * 60 * 1000;
 
-    // Create hash
+    // Create HMAC hash
     const data = `${email}.${otp}.${expiresAt}`;
     const hash = crypto.createHmac('sha256', OTP_SECRET).update(data).digest('hex');
     
@@ -49,7 +76,10 @@ export async function POST(req: Request) {
         `,
       });
     } else {
-      console.log(`\n\n=== MOCK OTP FOR ${email} ===\n${otp}\n============================\n\n`);
+      // Development only — never log OTPs in production
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`\n\n=== DEV OTP FOR ${email} ===\n${otp}\n============================\n\n`);
+      }
     }
 
     const response = NextResponse.json({ success: true, message: 'OTP sent successfully' });

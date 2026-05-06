@@ -16,9 +16,6 @@ const firebaseConfig = {
 // This prevents build-time crashes on Vercel when env vars are missing
 const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
-if (typeof window !== "undefined") {
-  console.log("Firebase Init: API Key present?", !!apiKey);
-}
 
 const app = 
   typeof window !== "undefined" || apiKey

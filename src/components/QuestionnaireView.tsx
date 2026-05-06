@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { BrainCircuit, Loader2, ChevronRight, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { auth } from "@/lib/firebase";
 
 const LOADING_MESSAGES = [
   "Synthesizing your context...",
@@ -88,9 +89,18 @@ export function QuestionnaireView() {
     }, 2500);
 
     try {
+      // Get the current user's ID token for server-side auth verification
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        throw new Error("Please sign in to use the analysis feature.");
+      }
+
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           mode: "final-analysis",
           scenario,
