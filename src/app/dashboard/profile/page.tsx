@@ -16,13 +16,14 @@ import {
   ChevronRight,
   ShieldCheck,
   CheckCircle2,
-  Sparkles as SparklesIcon
+  Sparkles as SparklesIcon,
+  LogOut
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const { userAccount, setUserAccount } = useAppStore();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
@@ -195,6 +196,25 @@ export default function ProfilePage() {
                 <p className="text-sm font-medium">Data Privacy</p>
                 <p className="text-xs text-muted-foreground">Encryption enabled</p>
               </div>
+            </div>
+
+            {/* Logout */}
+            <div className="flex items-center justify-between border-t border-border pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                  <LogOut className="w-4 h-4 text-destructive" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-destructive">Sign Out</p>
+                  <p className="text-xs text-muted-foreground">Log out of your account</p>
+                </div>
+              </div>
+              <button 
+                onClick={signOut}
+                className="text-xs font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Log Out
+              </button>
             </div>
           </div>
         </section>
