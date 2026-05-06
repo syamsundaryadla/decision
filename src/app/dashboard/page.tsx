@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { DecisionSimulator } from "@/components/DecisionSimulator";
@@ -42,8 +43,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <img src="/decisely-light.png" alt="Decisely Logo" className="h-10 md:h-14 w-auto object-contain dark:hidden" />
-              <img src="/decisely.png" alt="Decisely Logo" className="h-8 md:h-12 w-auto object-contain hidden dark:block" />
+              <Image src="/decisely-light.png" alt="Decisely" width={140} height={56} className="h-10 md:h-14 w-auto object-contain dark:hidden" priority />
+              <Image src="/decisely.png" alt="Decisely" width={120} height={48} className="h-8 md:h-12 w-auto object-contain hidden dark:block" priority />
             </Link>
 
             {/* Right actions */}

@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import {
@@ -185,8 +186,8 @@ export default function LoginPage() {
         <div className="w-full max-w-[440px] mx-auto">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center justify-center mb-6 hover:opacity-80 transition-opacity">
-              <img src="/decisely-light.png" alt="Decisely Logo" className="h-12 w-auto object-contain dark:hidden" />
-              <img src="/decisely.png" alt="Decisely Logo" className="h-10 w-auto object-contain hidden dark:block" />
+              <Image src="/decisely-light.png" alt="Decisely" width={120} height={48} className="h-12 w-auto object-contain dark:hidden" priority />
+              <Image src="/decisely.png" alt="Decisely" width={100} height={40} className="h-10 w-auto object-contain hidden dark:block" priority />
             </Link>
             <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2">
               {otpStep ? "Verify your email" : view === "login" ? "Welcome back" : view === "signup" ? "Create an account" : "Reset Password"}

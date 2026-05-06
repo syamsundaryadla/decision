@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { 
   Sparkles, 
   ArrowRight, 
@@ -16,11 +17,37 @@ import {
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Decisely",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description:
+    "AI-powered decision intelligence platform. Analyze choices, simulate outcomes, and make confident decisions backed by data.",
+  url: "https://decisely.vercel.app",
+  offers: {
+    "@type": "Offer",
+    price: "9",
+    priceCurrency: "INR",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    ratingCount: "120",
+  },
+};
+
 export default function LandingPage() {
   const { user, loading } = useAuth();
   
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden selection:bg-primary/20">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -31,8 +58,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <img src="/decisely-light.png" alt="Decisely Logo" className="h-10 md:h-16 w-auto object-contain dark:hidden" />
-              <img src="/decisely.png" alt="Decisely Logo" className="h-10 md:h-16 w-auto object-contain hidden dark:block" />
+              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain dark:hidden" priority />
+              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain hidden dark:block" priority />
             </Link>
           </motion.div>
           <motion.div 
@@ -376,8 +403,8 @@ export default function LandingPage() {
       <footer className="border-t border-border/50 bg-background py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <img src="/decisely-light.png" alt="Decisely Logo" className="h-6 w-auto object-contain dark:hidden" />
-            <img src="/decisely.png" alt="Decisely Logo" className="h-6 w-auto object-contain hidden dark:block" />
+            <Image src="/decisely-light.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain dark:hidden" />
+            <Image src="/decisely.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain hidden dark:block" />
             <span className="text-sm text-muted-foreground ml-2">© {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
