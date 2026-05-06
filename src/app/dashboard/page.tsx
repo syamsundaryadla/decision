@@ -41,10 +41,10 @@ export default function DashboardPage() {
         <div className="max-w-[900px] mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <div className="flex items-center">
+            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
               <img src="/decisely-light.png" alt="Decisely Logo" className="h-10 md:h-14 w-auto object-contain dark:hidden" />
               <img src="/decisely.png" alt="Decisely Logo" className="h-8 md:h-12 w-auto object-contain hidden dark:block" />
-            </div>
+            </Link>
 
             {/* Right actions */}
             <div className="flex items-center gap-2">
