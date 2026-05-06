@@ -32,42 +32,47 @@ export async function POST(req: NextRequest) {
       .map((o: { text: string }, i: number) => `Option ${i + 1}: ${o.text}`)
       .join("\n");
 
-    const prompt = `You are an expert decision analyst. Analyze the following decision scenario and provide a comprehensive, data-driven analysis.
+    const prompt = `You are a world-class Decision Scientist and Chief Strategy Officer. Your task is to analyze the following decision scenario and provide a highly rigorous, objective, and data-driven analysis. 
 
-**Domain:** ${domain}
-**Scenario:** ${scenario}
+**Domain / Industry Context:** ${domain}
+**The Core Scenario:** ${scenario}
 
-**Options:**
+**Available Options:**
 ${optionsList}
 
-**User Parameters:** ${parameterContext || "Default values"}
+**User Parameters (Weight these heavily in your evaluation):** ${parameterContext || "Default values"}
+
+### Analysis Directives:
+1. **Rigor & Logic**: Apply established decision-making frameworks (e.g., Cost-Benefit Analysis, Expected Value, Second-Order Effects). Look beyond the obvious.
+2. **Trade-offs**: Explicitly evaluate the trade-offs of each option. What are the hidden costs or risks?
+3. **Parameter Alignment**: The 'User Parameters' dictate what the user values most. Your final recommendation MUST strongly align with these specific parameters.
+4. **Actionable Insights**: Provide a profound, non-obvious insight that shifts how the user thinks about this problem.
 
 Respond ONLY with valid JSON in this exact format (no markdown, no code fences, no extra text):
 {
-  "recommendation": "A clear, concise 1-2 sentence recommendation of the best option",
+  "recommendation": "A highly confident, decisive 1-2 sentence recommendation of the optimal option.",
   "recommendedOption": "The exact text of the recommended option",
-  "insight": "A key insight about this decision (2-3 sentences)",
-  "whyThisWorks": "Why the recommended option is the best fit given the user's parameters and context (2-3 sentences)",
+  "insight": "A profound, non-obvious strategic insight about this specific decision (2-3 sentences).",
+  "whyThisWorks": "A compelling justification of why this option is superior, explicitly connecting it to the User Parameters and mitigating major risks (2-3 sentences).",
   "options": [
     {
       "option": "Exact text of option 1",
       "successProbability": 75,
       "riskLevel": "Low|Medium|High",
       "rewardLevel": "Low|Medium|High",
-      "pros": ["pro 1", "pro 2", "pro 3"],
-      "cons": ["con 1", "con 2", "con 3"],
-      "detailedAnalysis": "A detailed 3-4 sentence analysis of this option considering the domain and parameters"
+      "pros": ["Highly specific pro 1", "Highly specific pro 2", "Highly specific pro 3"],
+      "cons": ["Critical con or hidden risk 1", "Critical con or hidden risk 2", "Critical con or hidden risk 3"],
+      "detailedAnalysis": "A rigorous 3-4 sentence evaluation of this option. Discuss its feasibility, alignment with parameters, and potential second-order consequences."
     }
   ]
 }
 
-Important rules:
-- successProbability must be a number between 0 and 100
-- riskLevel and rewardLevel must be exactly "Low", "Medium", or "High"
-- Each option must have exactly 3 pros and 3 cons
-- Provide analysis for ALL options given
-- Be specific and actionable, not generic
-- Consider the user's parameter preferences in your analysis`;
+### Formatting Rules:
+- \`successProbability\` must be an integer between 0 and 100 representing the realistic likelihood of a positive outcome.
+- \`riskLevel\` and \`rewardLevel\` must be exactly "Low", "Medium", or "High".
+- Each option MUST have exactly 3 pros and 3 cons. Ensure they are specific, not generic filler.
+- You MUST provide analysis for EVERY option provided in the prompt.
+- Do not output anything outside of the JSON structure.`;
 
     const geminiResponse = await fetch(GEMINI_URL, {
       method: "POST",
@@ -75,9 +80,9 @@ Important rules:
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
+          temperature: 0.4,
+          topK: 32,
+          topP: 0.90,
           maxOutputTokens: 4096,
           responseMimeType: "application/json",
         },

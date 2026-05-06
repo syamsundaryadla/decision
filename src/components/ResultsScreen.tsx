@@ -13,6 +13,8 @@ import {
   TrendingUp,
   Shield,
   RotateCcw,
+  Sparkles,
+  Target
 } from "lucide-react";
 import { useState } from "react";
 
@@ -26,7 +28,7 @@ function ProgressBar({
   color?: string;
 }) {
   return (
-    <div className={cn("w-full h-2 bg-muted rounded-full overflow-hidden", className)}>
+    <div className={cn("w-full h-2.5 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm", className)}>
       <div
         className={cn("h-full rounded-full transition-all duration-1000 ease-out", color)}
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
@@ -36,18 +38,19 @@ function ProgressBar({
 }
 
 function RiskBadge({ level }: { level: string }) {
-  const config: Record<string, { bg: string; text: string }> = {
-    Low: { bg: "bg-success/10", text: "text-success" },
-    Medium: { bg: "bg-warning/10", text: "text-warning" },
-    High: { bg: "bg-destructive/10", text: "text-destructive" },
+  const config: Record<string, { bg: string; text: string; border: string }> = {
+    Low: { bg: "bg-success/10", text: "text-success", border: "border-success/20" },
+    Medium: { bg: "bg-warning/10", text: "text-warning", border: "border-warning/20" },
+    High: { bg: "bg-destructive/10", text: "text-destructive", border: "border-destructive/20" },
   };
   const style = config[level] || config.Medium;
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium",
+        "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border",
         style.bg,
-        style.text
+        style.text,
+        style.border
       )}
     >
       {level}
@@ -82,93 +85,104 @@ export function ResultsScreen() {
   };
 
   return (
-    <div className="space-y-5 md:space-y-6 pb-8">
-      {/* Header */}
+    <div className="space-y-6 md:space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Header Actions */}
       <div className="flex items-center justify-between">
         <button
           onClick={handleBack}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 min-h-[44px] px-1"
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200 bg-card hover:bg-muted border border-border px-4 py-2 rounded-xl shadow-sm"
           id="back-button"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to inputs
+          Edit Inputs
         </button>
         <button
           onClick={handleNewDecision}
-          className="flex items-center gap-1.5 text-sm font-medium text-primary hover:opacity-80 transition-opacity duration-200 min-h-[44px] px-2"
+          className="flex items-center gap-2 text-sm font-medium text-primary-foreground bg-primary hover:opacity-90 transition-all duration-200 px-4 py-2 rounded-xl shadow-sm shadow-primary/20"
           id="new-decision-button"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          New decision
+          <RotateCcw className="w-4 h-4" />
+          New Decision
         </button>
       </div>
 
-      {/* Recommendation card */}
-      <div className="bg-card border border-border rounded-2xl p-5 md:p-6 shadow-sm">
-        <div className="flex items-start gap-3 mb-4">
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
-            <Trophy className="w-5 h-5 text-success" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">
-              Recommendation
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              AI-powered analysis result
-            </p>
-          </div>
-        </div>
-        <p className="text-sm text-foreground leading-relaxed mb-4">
-          {result.recommendation}
-        </p>
-        {result.recommendedOption && (
-          <div className="inline-flex items-center gap-2 bg-success/10 text-success rounded-lg px-3 py-2 text-sm font-medium">
-            <CheckCircle2 className="w-4 h-4" />
-            {result.recommendedOption}
-          </div>
-        )}
+      <div className="text-center space-y-2 mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+          Analysis <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Complete</span>
+        </h1>
+        <p className="text-muted-foreground">Based on your parameters and scenario context.</p>
       </div>
 
-      {/* Insight card */}
-      <div className="bg-card border border-border rounded-2xl p-5 md:p-6">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-info/10 flex items-center justify-center">
-            <Lightbulb className="w-4.5 h-4.5 text-info" />
+      {/* Hero Recommendation Card */}
+      <div className="relative overflow-hidden bg-card border-2 border-primary/20 rounded-3xl p-6 md:p-8 shadow-lg shadow-primary/5">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row gap-6 items-start">
+          <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 shadow-inner">
+            <Trophy className="w-7 h-7 text-primary" />
           </div>
-          <div>
-            <h3 className="text-sm font-semibold text-foreground">
-              Key Insight
+          <div className="flex-1 space-y-4">
+            <div>
+              <h2 className="text-sm font-bold tracking-widest text-primary uppercase mb-1">
+                Final Recommendation
+              </h2>
+              <p className="text-xl md:text-2xl font-semibold text-foreground leading-tight">
+                {result.recommendation}
+              </p>
+            </div>
+            
+            {result.recommendedOption && (
+              <div className="inline-flex items-center gap-2.5 bg-background/50 backdrop-blur border border-border rounded-xl px-4 py-3 shadow-sm">
+                <Target className="w-5 h-5 text-success" />
+                <span className="text-sm font-medium text-foreground">
+                  Target Option: <span className="text-success ml-1">{result.recommendedOption}</span>
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Executive Summary Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        {/* Insight Card */}
+        <div className="bg-card border border-border rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center border border-info/20">
+              <Lightbulb className="w-5 h-5 text-info" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">
+              Strategic Insight
             </h3>
           </div>
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+            {result.insight}
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {result.insight}
-        </p>
-      </div>
 
-      {/* Why this works */}
-      <div className="bg-card border border-border rounded-2xl p-5 md:p-6">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-warning/10 flex items-center justify-center">
-            <Shield className="w-4.5 h-4.5 text-warning" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-foreground">
+        {/* Why this works */}
+        <div className="bg-card border border-border rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center border border-warning/20">
+              <Sparkles className="w-5 h-5 text-warning" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">
               Why This Works
             </h3>
           </div>
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+            {result.whyThisWorks}
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {result.whyThisWorks}
-        </p>
       </div>
 
-      {/* Option cards */}
-      <section>
-        <h3 className="text-base font-semibold text-foreground mb-4">
-          Option Analysis
+      {/* Option Cards */}
+      <section className="pt-6 border-t border-border/50">
+        <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+          Option Breakdown
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {result.options.map((opt, index) => {
             const isExpanded = expandedOptions.has(index);
             const isRecommended = opt.option === result.recommendedOption;
@@ -177,92 +191,89 @@ export function ResultsScreen() {
               <div
                 key={index}
                 className={cn(
-                  "bg-card border rounded-2xl overflow-hidden transition-all duration-200",
+                  "group relative bg-card border rounded-3xl overflow-hidden transition-all duration-300 flex flex-col",
                   isRecommended
-                    ? "border-success/40 shadow-sm"
-                    : "border-border"
+                    ? "border-success/50 shadow-lg shadow-success/5 ring-1 ring-success/20"
+                    : "border-border shadow-sm hover:border-primary/30 hover:shadow-md"
                 )}
               >
-                {/* Card header */}
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 mr-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        {isRecommended && (
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-success bg-success/10 px-2 py-0.5 rounded-md">
-                            Recommended
-                          </span>
-                        )}
-                      </div>
-                      <h4 className="text-sm font-semibold text-foreground leading-snug">
+                {/* Recommended Highlight Bar */}
+                {isRecommended && (
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-success to-emerald-400" />
+                )}
+
+                <div className="p-6 md:p-8 flex-1">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex-1 pr-4">
+                      {isRecommended && (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-success/10 text-success text-[11px] font-bold uppercase tracking-wider mb-3 border border-success/20">
+                          <Trophy className="w-3 h-3" /> Best Choice
+                        </div>
+                      )}
+                      <h4 className="text-lg font-bold text-foreground leading-tight">
                         {opt.option}
                       </h4>
                     </div>
                   </div>
 
-                  {/* Success probability */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs text-muted-foreground">
+                  {/* Metrics Row */}
+                  <div className="grid grid-cols-2 gap-4 mb-8 bg-muted/30 p-4 rounded-2xl border border-border/50">
+                    <div className="col-span-2 sm:col-span-1">
+                      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                         Success Probability
-                      </span>
-                      <span className="text-xs font-semibold text-foreground tabular-nums">
-                        {opt.successProbability}%
-                      </span>
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl font-bold text-foreground tabular-nums">
+                          {opt.successProbability}%
+                        </span>
+                        <ProgressBar
+                          className="flex-1 max-w-[100px]"
+                          value={opt.successProbability}
+                          color={
+                            opt.successProbability >= 70
+                              ? "bg-success"
+                              : opt.successProbability >= 40
+                              ? "bg-warning"
+                              : "bg-destructive"
+                          }
+                        />
+                      </div>
                     </div>
-                    <ProgressBar
-                      value={opt.successProbability}
-                      color={
-                        opt.successProbability >= 70
-                          ? "bg-success"
-                          : opt.successProbability >= 40
-                          ? "bg-warning"
-                          : "bg-destructive"
-                      }
-                    />
-                  </div>
-
-                  {/* Risk & Reward badges */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs text-muted-foreground">Risk:</span>
-                      <RiskBadge level={opt.riskLevel} />
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs text-muted-foreground">Reward:</span>
-                      <RiskBadge level={opt.rewardLevel} />
+                    <div className="col-span-2 sm:col-span-1 flex items-center justify-between sm:justify-end gap-4">
+                      <div>
+                        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Risk</p>
+                        <RiskBadge level={opt.riskLevel} />
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Reward</p>
+                        <RiskBadge level={opt.rewardLevel} />
+                      </div>
                     </div>
                   </div>
 
                   {/* Pros & Cons */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
-                    <div className="bg-success/5 rounded-xl p-3 border border-success/10">
-                      <p className="text-xs font-semibold text-success mb-3 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Pros
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-success/5 rounded-2xl p-4 border border-success/10 transition-colors group-hover:bg-success/10">
+                      <p className="text-sm font-bold text-success mb-3 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" /> Pros
                       </p>
-                      <ul className="space-y-2.5">
+                      <ul className="space-y-3">
                         {opt.pros.map((pro, i) => (
-                          <li
-                            key={i}
-                            className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-success/40 mt-1 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/80 leading-relaxed">
+                            <span className="w-1.5 h-1.5 rounded-full bg-success mt-1.5 flex-shrink-0 shadow-sm" />
                             <span>{pro}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div className="bg-destructive/5 rounded-xl p-3 border border-destructive/10">
-                      <p className="text-xs font-semibold text-destructive mb-3 flex items-center gap-1.5">
-                        <XCircle className="w-3.5 h-3.5" /> Cons
+                    <div className="bg-destructive/5 rounded-2xl p-4 border border-destructive/10 transition-colors group-hover:bg-destructive/10">
+                      <p className="text-sm font-bold text-destructive mb-3 flex items-center gap-2">
+                        <XCircle className="w-4 h-4" /> Cons
                       </p>
-                      <ul className="space-y-2.5">
+                      <ul className="space-y-3">
                         {opt.cons.map((con, i) => (
-                          <li
-                            key={i}
-                            className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-destructive/40 mt-1 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/80 leading-relaxed">
+                            <span className="w-1.5 h-1.5 rounded-full bg-destructive mt-1.5 flex-shrink-0 shadow-sm" />
                             <span>{con}</span>
                           </li>
                         ))}
@@ -271,33 +282,33 @@ export function ResultsScreen() {
                   </div>
                 </div>
 
-                {/* Expandable section */}
-                <button
-                  onClick={() => toggleExpand(index)}
-                  className="w-full flex items-center justify-center gap-1.5 py-3 border-t border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 min-h-[44px]"
-                  id={`expand-option-${index}`}
-                >
-                  {isExpanded ? (
-                    <>
-                      Hide details <ChevronUp className="w-3.5 h-3.5" />
-                    </>
-                  ) : (
-                    <>
-                      Show details <ChevronDown className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
+                {/* Expandable Action */}
+                <div className="border-t border-border mt-auto">
+                  <button
+                    onClick={() => toggleExpand(index)}
+                    className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                  >
+                    {isExpanded ? (
+                      <>Hide Deep Analysis <ChevronUp className="w-4 h-4" /></>
+                    ) : (
+                      <>Read Deep Analysis <ChevronDown className="w-4 h-4" /></>
+                    )}
+                  </button>
 
-                {isExpanded && (
-                  <div className="px-5 pb-5 border-t border-border pt-4">
-                    <h5 className="text-xs font-semibold text-foreground mb-2">
-                      Detailed Analysis
-                    </h5>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {opt.detailedAnalysis}
-                    </p>
+                  <div className={cn(
+                    "overflow-hidden transition-all duration-300 ease-in-out bg-muted/20",
+                    isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                  )}>
+                    <div className="p-6 md:p-8 border-t border-border/50">
+                      <h5 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-primary" /> Evaluation
+                      </h5>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {opt.detailedAnalysis}
+                      </p>
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             );
           })}
