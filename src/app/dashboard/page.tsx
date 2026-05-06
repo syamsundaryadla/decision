@@ -42,8 +42,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <div className="flex items-center">
-              <img src="/decisely-light.png" alt="Decisely Logo" className="h-12 w-auto object-contain dark:hidden" />
-              <img src="/decisely.png" alt="Decisely Logo" className="h-12 w-auto object-contain hidden dark:block" />
+              <img src="/decisely-light.png" alt="Decisely Logo" className="h-8 md:h-12 w-auto object-contain dark:hidden" />
+              <img src="/decisely.png" alt="Decisely Logo" className="h-8 md:h-12 w-auto object-contain hidden dark:block" />
             </div>
 
             {/* Right actions */}

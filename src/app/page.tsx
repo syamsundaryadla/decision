@@ -19,8 +19,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center">
-              <img src="/decisely-light.png" alt="Decisely Logo" className="h-16 w-auto object-contain dark:hidden" />
-              <img src="/decisely.png" alt="Decisely Logo" className="h-16 w-auto object-contain hidden dark:block" />
+              <img src="/decisely-light.png" alt="Decisely Logo" className="h-10 md:h-16 w-auto object-contain dark:hidden" />
+              <img src="/decisely.png" alt="Decisely Logo" className="h-10 md:h-16 w-auto object-contain hidden dark:block" />
             </div>
           </motion.div>
           <motion.div
