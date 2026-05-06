@@ -8,15 +8,15 @@ import { useAppStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { Clock, ChevronRight, FileText, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { AnalysisResult, Option, Parameter } from "@/lib/types";
+import { AnalysisResult, OptionInput, DomainParameter } from "@/lib/types";
 
 // Add a type for the document since types.ts doesn't have the firestore doc structure
 interface HistoryDoc {
   id: string;
   scenario: string;
   domain: string;
-  options: Option[];
-  parameters: Parameter[];
+  options: OptionInput[];
+  parameters: DomainParameter[];
   result: AnalysisResult;
   createdAt: any;
 }
@@ -26,7 +26,7 @@ export default function HistoryPage() {
   const [reports, setReports] = useState<HistoryDoc[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const { setResult, setShowResults } = useAppStore();
+  const { setResult, setCurrentStep } = useAppStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function HistoryPage() {
   const handleOpenReport = (report: HistoryDoc) => {
     // We only need to restore the result to view the history
     setResult(report.result);
-    setShowResults(true);
+    setCurrentStep("results");
     router.push("/dashboard"); // ResultsScreen mounts in the dashboard
   };
 

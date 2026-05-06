@@ -50,6 +50,11 @@ export function InputFlow() {
     setCurrentStep,
     userAccount,
     setUserAccount,
+    setIsAnalyzing,
+    setLoadingMessage,
+    setError,
+    isAnalyzing,
+    error,
   } = useAppStore();
 
   const { user } = useAuth();
