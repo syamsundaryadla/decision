@@ -23,9 +23,14 @@ export async function verifyAdminAuth(req: NextRequest) {
     // Optional: check role in Firestore if we want
     let isFirestoreAdmin = false;
     if (adminDb) {
-      const userDoc = await adminDb.collection("users").doc(decodedToken.uid).get();
-      if (userDoc.exists && userDoc.data()?.role === "admin" || userDoc.data()?.role === "super_admin") {
-        isFirestoreAdmin = true;
+      try {
+        const userDoc = await adminDb.collection("users").doc(decodedToken.uid).get();
+        const userData = userDoc.data();
+        if (userDoc.exists && (userData?.role === "admin" || userData?.role === "super_admin")) {
+          isFirestoreAdmin = true;
+        }
+      } catch (dbError) {
+        console.warn("Firestore admin check skipped (likely missing credentials in local dev):", (dbError as Error).message);
       }
     }
 
