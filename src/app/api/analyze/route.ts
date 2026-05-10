@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     }
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent`;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
 
     if (!GEMINI_API_KEY || GEMINI_API_KEY === "your_gemini_api_key_here") {
       return NextResponse.json(
@@ -279,10 +279,11 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.4,
-        topK: 32,
-        topP: 0.9,
-        maxOutputTokens: 4096,
+        topK: 64,
+        topP: 0.95,
+        maxOutputTokens: 16384,
         responseMimeType: "application/json",
+        thinking_level: mode === "final-analysis" ? "MEDIUM" : "LOW",
       },
     });
 
