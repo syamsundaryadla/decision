@@ -410,5 +410,3 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
     );
   }
 }
-
-}}}}}}
