@@ -64,24 +64,27 @@ async function checkAndDecrementCredits(uid: string): Promise<{ allowed: boolean
 
   try {
     const result = await adminDb.runTransaction(async (transaction) => {
+      console.log(`[CREDIT CHECK] Verifying credits for UID: ${uid}`);
       const userDoc = await transaction.get(userRef);
 
       if (!userDoc.exists) {
-        // First-time user: create with default credits
+        console.log(`[CREDIT CHECK] New user detected for UID: ${uid}. Granting 5 credits.`);
         transaction.set(userRef, { credits: 5, createdAt: FieldValue.serverTimestamp() });
-        // Use one credit for this analysis
         transaction.update(userRef, { credits: 4 });
         return { allowed: true, credits: 4 };
       }
 
       const data = userDoc.data();
       const currentCredits = data?.credits ?? 0;
+      console.log(`[CREDIT CHECK] UID: ${uid} has ${currentCredits} credits.`);
 
       if (currentCredits < 1) {
+        console.warn(`[CREDIT CHECK] Access denied for UID: ${uid} (0 credits).`);
         return { allowed: false, credits: 0 };
       }
 
       transaction.update(userRef, { credits: FieldValue.increment(-1) });
+      console.log(`[CREDIT CHECK] Decremented credit for UID: ${uid}. Remaining: ${currentCredits - 1}`);
       return { allowed: true, credits: currentCredits - 1 };
     });
 
@@ -126,7 +129,7 @@ export async function POST(req: NextRequest) {
     }
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent`;
 
     if (!GEMINI_API_KEY || GEMINI_API_KEY === "your_gemini_api_key_here") {
       return NextResponse.json(
@@ -289,7 +292,10 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       geminiResponse = await fetch(GEMINI_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": GEMINI_API_KEY as string
+        },
         body: geminiPayload,
       });
 
@@ -404,3 +410,5 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
     );
   }
 }
+
+}}}}}}

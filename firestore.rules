@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if the user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if the document belongs to the signed-in user
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Reports collection: Users can only read and write their own reports
+    match /reports/{reportId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Users collection: Users can only read and write their own profile/metadata
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && isOwner(userId);
+    }
+    
+    // Default: deny everything else
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

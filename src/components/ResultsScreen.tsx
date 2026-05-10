@@ -71,31 +71,69 @@ export function ResultsScreen() {
   const handleDownloadPdf = async () => {
     if (!pdfRef.current) return;
     setIsGeneratingPdf(true);
-    
+
     try {
       // Dynamically import to avoid SSR issues
-      // @ts-ignore
-      const html2pdf = (await import('html2pdf.js')).default;
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
       const element = pdfRef.current;
-      
+
       // Temporarily hide the action buttons for the PDF
       const actionButtons = element.querySelector('#action-buttons');
       if (actionButtons) (actionButtons as HTMLElement).style.display = 'none';
 
-      const opt = {
-        margin:       15,
-        filename:     'decisely-analysis.pdf',
-        image:        { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
-      };
+      // Resolve CSS custom properties into computed colors for html2canvas
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        windowWidth: 1200,
+        backgroundColor: getComputedStyle(element).backgroundColor || '#ffffff',
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Force computed styles on the cloned element so CSS variables resolve
+          const clonedEl = clonedDoc.body.querySelector('[data-pdf-root]') || clonedDoc.body;
+          clonedEl.querySelectorAll('*').forEach((node) => {
+            const el = node as HTMLElement;
+            const computed = getComputedStyle(el);
+            el.style.color = computed.color;
+            el.style.backgroundColor = computed.backgroundColor;
+            el.style.borderColor = computed.borderColor;
+          });
+        },
+      });
 
-      await html2pdf().set(opt).from(element).save();
-      
       // Restore action buttons
       if (actionButtons) (actionButtons as HTMLElement).style.display = 'flex';
+
+      // Generate PDF with proper multi-page support
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const margin = 10;
+      const contentWidth = imgWidth - margin * 2;
+      const imgHeight = (canvas.height * contentWidth) / canvas.width;
+
+      const pdf = new jsPDF('portrait', 'mm', 'a4');
+      let heightLeft = imgHeight;
+      let position = margin;
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      // First page
+      pdf.addImage(imgData, 'JPEG', margin, position, contentWidth, imgHeight);
+      heightLeft -= (pageHeight - margin * 2);
+
+      // Additional pages if content overflows
+      while (heightLeft > 0) {
+        position = -(pageHeight - margin * 2) * (Math.ceil((imgHeight - heightLeft) / (pageHeight - margin * 2))) + margin;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', margin, position, contentWidth, imgHeight);
+        heightLeft -= (pageHeight - margin * 2);
+      }
+
+      pdf.save('decisely-analysis.pdf');
     } catch (error) {
       console.error("Failed to generate PDF:", error);
+      alert("Failed to generate PDF. Please try again.");
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -122,7 +160,7 @@ export function ResultsScreen() {
   };
 
   return (
-    <div ref={pdfRef} className="space-y-6 md:space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 bg-background">
+    <div ref={pdfRef} data-pdf-root className="space-y-6 md:space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 bg-background">
       {/* Header Actions */}
       <div id="action-buttons" className="flex flex-wrap items-center justify-between gap-4">
         <button

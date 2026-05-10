@@ -16,7 +16,9 @@ import {
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   type User,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
+import { auth, googleProvider, db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import { useAppStore } from "@/lib/store";
 
 interface AuthContextType {
   user: User | null;
@@ -42,20 +44,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const setUserAccount = useAppStore((state) => state.setUserAccount);
+
   useEffect(() => {
-    // Skip if auth is not initialized (placeholder object)
+    // Skip if auth is not initialized
     if (!auth || !auth.onAuthStateChanged) {
-      console.warn("AuthProvider: Auth not initialized (missing API key)");
       setLoading(false);
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
+
+  // Sync user data from Firestore
+  useEffect(() => {
+    if (!user || !db) return;
+
+    const userDocRef = doc(db, "users", user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setUserAccount({
+          credits: data.credits ?? 0,
+          subscriptionStatus: data.subscriptionStatus ?? "free",
+        });
+      } else {
+        // First time user - they'll get credits on first analysis via API
+        setUserAccount({ credits: 5, subscriptionStatus: "free" });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user, setUserAccount]);
 
   const signInWithGoogle = async () => {
     if (!auth || !auth.onAuthStateChanged) {
