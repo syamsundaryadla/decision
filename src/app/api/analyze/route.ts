@@ -68,9 +68,12 @@ async function checkAndDecrementCredits(uid: string): Promise<{ allowed: boolean
       const userDoc = await transaction.get(userRef);
 
       if (!userDoc.exists) {
-        console.log(`[CREDIT CHECK] New user detected for UID: ${uid}. Granting 5 credits.`);
-        transaction.set(userRef, { credits: 5, createdAt: FieldValue.serverTimestamp() });
-        transaction.update(userRef, { credits: 4 });
+        console.log(`[CREDIT CHECK] New user detected for UID: ${uid}. Granting 5 credits (1 used now).`);
+        transaction.set(userRef, { 
+          credits: 4, 
+          subscriptionStatus: "free",
+          createdAt: FieldValue.serverTimestamp() 
+        });
         return { allowed: true, credits: 4 };
       }
 
