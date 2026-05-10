@@ -283,7 +283,7 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
         topP: 0.95,
         maxOutputTokens: 16384,
         responseMimeType: "application/json",
-        thinking_level: mode === "final-analysis" ? "MEDIUM" : "LOW",
+        thinking_level: "LOW",
       },
     });
 
