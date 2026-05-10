@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     }
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent`;
 
     if (!GEMINI_API_KEY || GEMINI_API_KEY === "your_gemini_api_key_here") {
       return NextResponse.json(
