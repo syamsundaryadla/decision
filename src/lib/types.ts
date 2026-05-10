@@ -80,6 +80,9 @@ export interface UserAnswer {
 }
 
 export interface UserAccount {
+  email?: string;
+  role?: "user" | "admin" | "super_admin";
+  isSuspended?: boolean;
   credits: number;
   subscriptionStatus: "free" | "pro" | "enterprise";
   lastBilled?: string;
@@ -87,4 +90,32 @@ export interface UserAccount {
     emailNotifications: boolean;
     aiVerbosity: "concise" | "detailed";
   };
+  createdAt?: string | Date;
+}
+
+export interface CreditTransaction {
+  id?: string;
+  userId: string;
+  amount: number; // positive or negative
+  type: "grant" | "usage" | "admin_adjustment" | "purchase";
+  description: string;
+  createdAt: any; // Firestore Timestamp
+}
+
+export interface DailyStats {
+  id?: string; // e.g. "2026-05-10"
+  date: string;
+  totalRequests: number;
+  failedRequests: number;
+  freeCreditsUsed: number;
+  paidCreditsUsed: number;
+  newUsers: number;
+}
+
+export interface ErrorLog {
+  id?: string;
+  userId: string;
+  error: string;
+  endpoint: string;
+  createdAt: any;
 }

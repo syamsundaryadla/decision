@@ -54,9 +54,8 @@ async function verifyAuth(req: NextRequest): Promise<{ uid: string } | null> {
 }
 
 // [VULN-006 FIX] Check and decrement credits server-side
-async function checkAndDecrementCredits(uid: string): Promise<{ allowed: boolean; credits: number }> {
+async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = false): Promise<{ allowed: boolean; credits: number }> {
   if (!adminDb || uid === "dev-user") {
-    // In dev mode without admin DB, allow requests
     return { allowed: true, credits: 999 };
   }
 
@@ -72,12 +71,51 @@ async function checkAndDecrementCredits(uid: string): Promise<{ allowed: boolean
         transaction.set(userRef, { 
           credits: 4, 
           subscriptionStatus: "free",
+          role: "user",
+          isSuspended: false,
           createdAt: FieldValue.serverTimestamp() 
         });
+        
+        // Log transactions
+        const grantRef = adminDb.collection("credit_transactions").doc();
+        transaction.set(grantRef, {
+          userId: uid,
+          amount: 5,
+          type: "grant",
+          description: "Initial signup grant",
+          createdAt: FieldValue.serverTimestamp()
+        });
+        const usageRef = adminDb.collection("credit_transactions").doc();
+        transaction.set(usageRef, {
+          userId: uid,
+          amount: -1,
+          type: "usage",
+          description: "Analysis request",
+          createdAt: FieldValue.serverTimestamp()
+        });
+
+        // Track aggregate stats
+        const today = new Date().toISOString().split('T')[0];
+        const statsRef = adminDb.collection("analytics_daily").doc(today);
+        transaction.set(statsRef, {
+          date: today,
+          totalRequests: FieldValue.increment(1),
+          freeCreditsUsed: FieldValue.increment(1),
+          paidCreditsUsed: FieldValue.increment(0),
+          failedRequests: FieldValue.increment(0),
+          newUsers: FieldValue.increment(1)
+        }, { merge: true });
+
         return { allowed: true, credits: 4 };
       }
 
       const data = userDoc.data();
+      
+      if (data?.isSuspended) {
+        console.warn(`[CREDIT CHECK] Suspended user attempted access: ${uid}`);
+        return { allowed: false, credits: 0, suspended: true };
+      }
+
       const currentCredits = data?.credits ?? 0;
       console.log(`[CREDIT CHECK] UID: ${uid} has ${currentCredits} credits.`);
 
@@ -87,6 +125,26 @@ async function checkAndDecrementCredits(uid: string): Promise<{ allowed: boolean
       }
 
       transaction.update(userRef, { credits: FieldValue.increment(-1) });
+      
+      const usageRef = adminDb.collection("credit_transactions").doc();
+      transaction.set(usageRef, {
+        userId: uid,
+        amount: -1,
+        type: "usage",
+        description: "Analysis request",
+        createdAt: FieldValue.serverTimestamp()
+      });
+
+      // Track aggregate stats
+      const today = new Date().toISOString().split('T')[0];
+      const statsRef = adminDb.collection("analytics_daily").doc(today);
+      transaction.set(statsRef, {
+        date: today,
+        totalRequests: FieldValue.increment(1),
+        freeCreditsUsed: FieldValue.increment(isPaidAccount ? 0 : 1),
+        paidCreditsUsed: FieldValue.increment(isPaidAccount ? 1 : 0),
+      }, { merge: true });
+
       console.log(`[CREDIT CHECK] Decremented credit for UID: ${uid}. Remaining: ${currentCredits - 1}`);
       return { allowed: true, credits: currentCredits - 1 };
     });
@@ -109,6 +167,16 @@ export async function POST(req: NextRequest) {
     });
 
     if (!rateCheck.success) {
+      // Log rate limit violation if adminDb is available
+      if (adminDb) {
+        await adminDb.collection('security_logs').add({
+          type: "rate_limit_violation",
+          ip,
+          endpoint: "/api/analyze",
+          createdAt: FieldValue.serverTimestamp()
+        });
+      }
+
       return NextResponse.json(
         { error: "Too many requests. Please wait before trying again." },
         {
@@ -166,7 +234,17 @@ export async function POST(req: NextRequest) {
 
     // [VULN-006 FIX] Only check credits for final analysis (not question generation)
     if (mode === "final-analysis") {
-      const creditResult = await checkAndDecrementCredits(authResult.uid);
+      const isPaid = false; // TODO: Determine from user profile if they have a paid sub
+      const creditResult = await checkAndDecrementCredits(authResult.uid, isPaid);
+      
+      // @ts-ignore - Handle newly added suspended flag from the modified checkAndDecrementCredits
+      if (creditResult.suspended) {
+        return NextResponse.json(
+          { error: "Your account has been suspended." },
+          { status: 403 }
+        );
+      }
+
       if (!creditResult.allowed) {
         return NextResponse.json(
           { error: "Insufficient credits. Please upgrade your plan." },
@@ -305,22 +383,35 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
         body: geminiPayload,
       });
 
-      // Success or non-retryable error — break out
-      if (geminiResponse.ok || ![429, 500, 503].includes(geminiResponse.status)) {
-        break;
-      }
+      if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
+        lastError = errorText;
+        console.error(`Gemini API Error (${geminiResponse.status}):`, errorText);
+        
+        // Log Gemini failure for analytics
+        if (adminDb && mode === "final-analysis") {
+          const today = new Date().toISOString().split('T')[0];
+          await adminDb.collection("analytics_daily").doc(today).set({
+            failedRequests: FieldValue.increment(1)
+          }, { merge: true });
 
-      // Retryable error — log and backoff
-      const errorData = await geminiResponse.text();
-      console.warn(
-        `Gemini API attempt ${attempt + 1}/${MAX_RETRIES} failed (${geminiResponse.status}). Retrying...`
-      );
-      lastError = errorData;
+          await adminDb.collection("api_logs").add({
+            userId: authResult.uid,
+            status: geminiResponse.status,
+            error: errorText.substring(0, 500),
+            createdAt: FieldValue.serverTimestamp()
+          });
+        }
 
-      if (attempt < MAX_RETRIES - 1) {
-        const backoffMs = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
-        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+        if (geminiResponse.status >= 500 || geminiResponse.status === 429) {
+          const delayMs = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+          continue;
+        }
+        break; // Don't retry client errors (400)
       }
+      
+      break; // Success! Break out of the retry loop.
     }
 
     if (!geminiResponse || !geminiResponse.ok) {
