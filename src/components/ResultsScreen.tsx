@@ -16,7 +16,8 @@ import {
   Sparkles,
   Target,
   Download,
-  Loader2
+  Loader2,
+  Share2
 } from "lucide-react";
 import { useState, useRef } from "react";
 
@@ -73,42 +74,25 @@ export function ResultsScreen() {
     setIsGeneratingPdf(true);
 
     try {
-      // Dynamically import to avoid SSR issues
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
       const element = pdfRef.current;
-
-      // Temporarily hide the action buttons for the PDF
       const actionButtons = element.querySelector('#action-buttons');
       if (actionButtons) (actionButtons as HTMLElement).style.display = 'none';
 
-      // Resolve CSS custom properties into computed colors for html2canvas
+      // Simplified html2canvas config for better stability
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        windowWidth: 1200,
-        backgroundColor: getComputedStyle(element).backgroundColor || '#ffffff',
         logging: false,
-        onclone: (clonedDoc) => {
-          // Force computed styles on the cloned element so CSS variables resolve
-          const clonedEl = clonedDoc.body.querySelector('[data-pdf-root]') || clonedDoc.body;
-          clonedEl.querySelectorAll('*').forEach((node) => {
-            const el = node as HTMLElement;
-            const computed = getComputedStyle(el);
-            el.style.color = computed.color;
-            el.style.backgroundColor = computed.backgroundColor;
-            el.style.borderColor = computed.borderColor;
-          });
-        },
+        backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
       });
 
-      // Restore action buttons
       if (actionButtons) (actionButtons as HTMLElement).style.display = 'flex';
 
-      // Generate PDF with proper multi-page support
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
+      const imgWidth = 210;
+      const pageHeight = 297;
       const margin = 10;
       const contentWidth = imgWidth - margin * 2;
       const imgHeight = (canvas.height * contentWidth) / canvas.width;
@@ -118,11 +102,9 @@ export function ResultsScreen() {
       let position = margin;
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-      // First page
       pdf.addImage(imgData, 'JPEG', margin, position, contentWidth, imgHeight);
       heightLeft -= (pageHeight - margin * 2);
 
-      // Additional pages if content overflows
       while (heightLeft > 0) {
         position = -(pageHeight - margin * 2) * (Math.ceil((imgHeight - heightLeft) / (pageHeight - margin * 2))) + margin;
         pdf.addPage();
@@ -136,6 +118,27 @@ export function ResultsScreen() {
       alert("Failed to generate PDF. Please try again.");
     } finally {
       setIsGeneratingPdf(false);
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'My Decisely Analysis',
+          text: `Check out my decision analysis for: ${result.recommendedOption}`,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(
+          `Decision Analysis: ${result.recommendation}\nRecommended: ${result.recommendedOption}\nInsight: ${result.insight}`
+        );
+        alert('Analysis copied to clipboard!');
+      }
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        console.error('Error sharing:', error);
+      }
     }
   };
 
@@ -172,6 +175,13 @@ export function ResultsScreen() {
           Edit Inputs
         </button>
         <div className="flex items-center gap-3">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 text-sm font-medium text-foreground bg-card hover:bg-muted border border-border px-4 py-2 rounded-xl shadow-sm transition-all duration-200"
+          >
+            <Share2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Share</span>
+          </button>
           <button
             onClick={handleDownloadPdf}
             disabled={isGeneratingPdf}
