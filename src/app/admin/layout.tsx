@@ -9,7 +9,6 @@ import {
   LayoutDashboard, 
   Users, 
   ShieldAlert, 
-  Activity,
   LogOut,
   ChevronLeft
 } from "lucide-react";
@@ -68,7 +67,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navigation = [
     { name: "Overview", href: "/admin", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Analytics", href: "/admin/analytics", icon: Activity },
     { name: "Security", href: "/admin/security", icon: ShieldAlert },
   ];
 

@@ -30,7 +30,10 @@ export async function verifyAdminAuth(req: NextRequest) {
           isFirestoreAdmin = true;
         }
       } catch (dbError) {
-        console.warn("Firestore admin check skipped (likely missing credentials in local dev):", (dbError as Error).message);
+        // Suppress warning in dev to keep logs clean
+        if (process.env.NODE_ENV !== "development") {
+          console.warn("Firestore admin check failed:", (dbError as Error).message);
+        }
       }
     }
 

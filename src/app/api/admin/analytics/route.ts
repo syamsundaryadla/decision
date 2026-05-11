@@ -59,8 +59,17 @@ export async function GET(req: NextRequest) {
         totalFreeCredits30d
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch admin analytics:", error);
+    
+    // Specifically handle the "Could not load the default credentials" error in development
+    if (error.message?.includes("Could not load the default credentials")) {
+      return NextResponse.json({ 
+        error: "Firebase Admin Credentials Missing", 
+        message: "Please add FIREBASE_ADMIN_KEY to your .env.local to view admin analytics."
+      }, { status: 500 });
+    }
+
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

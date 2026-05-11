@@ -8,13 +8,15 @@ import {
   CheckCircle, 
   Coins,
   Loader2,
-  MoreVertical
+  MoreVertical,
+  AlertTriangle
 } from "lucide-react";
 
 export default function AdminUsers() {
   const { user } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   const fetchUsers = async () => {
@@ -25,16 +27,20 @@ export default function AdminUsers() {
       const res = await fetch("/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.ok) {
-        const json = await res.json();
-        setUsers(json.users);
+        if (res.ok) {
+          const json = await res.json();
+          setUsers(json.users);
+        } else {
+          const err = await res.json();
+          setError(err.message || err.error || "Failed to load users");
+        }
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+        setError("An unexpected error occurred.");
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
   useEffect(() => {
     fetchUsers();
@@ -107,6 +113,24 @@ export default function AdminUsers() {
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" />
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="bg-amber-500/10 text-amber-500 p-3 rounded-full">
+                        <AlertTriangle className="w-8 h-8" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-semibold">{error}</p>
+                        {error.includes("FIREBASE_ADMIN_KEY") && (
+                          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                            Add your service account key to <code>.env.local</code> to enable user management.
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (

@@ -26,6 +26,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -38,9 +39,13 @@ export default function AdminDashboard() {
         if (res.ok) {
           const json = await res.json();
           setData(json);
+        } else {
+          const err = await res.json();
+          setError(err.message || err.error || "Failed to load data");
         }
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
+        setError("An unexpected error occurred while fetching data.");
       } finally {
         setLoading(false);
       }
@@ -52,6 +57,30 @@ export default function AdminDashboard() {
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 space-y-4">
+        <div className="bg-amber-500/10 text-amber-500 p-4 rounded-full">
+          <AlertTriangle className="w-12 h-12" />
+        </div>
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold">Admin Data Unavailable</h2>
+          <p className="text-muted-foreground max-w-md">{error}</p>
+        </div>
+        {error.includes("FIREBASE_ADMIN_KEY") && (
+          <div className="bg-muted p-4 rounded-xl border border-border max-w-lg text-sm">
+            <p className="font-semibold mb-2">How to fix:</p>
+            <ol className="list-decimal ml-4 space-y-1 text-muted-foreground">
+              <li>Go to Firebase Console → Project Settings → Service Accounts</li>
+              <li>Generate a new Private Key (JSON)</li>
+              <li>Paste the contents as <code>FIREBASE_ADMIN_KEY</code> in your <code>.env.local</code></li>
+            </ol>
+          </div>
+        )}
       </div>
     );
   }

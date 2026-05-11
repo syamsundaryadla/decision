@@ -27,8 +27,17 @@ export async function GET(req: NextRequest) {
     }));
 
     return NextResponse.json({ users });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch users:", error);
+    
+    // Specifically handle the "Could not load the default credentials" error in development
+    if (error.message?.includes("Could not load the default credentials")) {
+      return NextResponse.json({ 
+        error: "Firebase Admin Credentials Missing", 
+        message: "Please add FIREBASE_ADMIN_KEY to your .env.local to view user data."
+      }, { status: 500 });
+    }
+
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -82,7 +91,13 @@ export async function POST(req: NextRequest) {
       // We could also revoke refresh tokens using admin auth
       if (isSuspended) {
         const { getAuth } = await import("firebase-admin/auth");
-        await getAuth().revokeRefreshTokens(userId);
+        try {
+          await getAuth().revokeRefreshTokens(userId);
+        } catch (dbError) {
+          if (process.env.NODE_ENV !== "development") {
+            console.warn("Firestore admin check skipped:", (dbError as Error).message);
+          }
+        }
       }
 
       return NextResponse.json({ success: true, message: `User suspension status set to ${isSuspended}` });

@@ -12,7 +12,8 @@ import {
   BarChart3, 
   Clock,
   CheckCircle2,
-  ChevronRight
+  ChevronRight,
+  Gamepad2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -58,8 +59,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain dark:hidden" priority />
-              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain hidden dark:block" priority />
+              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain dark:hidden" style={{ height: 'auto' }} priority />
+              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} priority />
             </Link>
           </motion.div>
           <motion.div 
@@ -68,15 +69,16 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="flex items-center gap-4"
           >
-            {loading ? null : user ? (
-              <Link 
-                href="/dashboard"
-                className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-sm flex items-center gap-2"
-              >
-                Go to Dashboard
-                <ArrowRight className="w-4 h-4" />
+            <nav className="hidden lg:flex items-center gap-8 mr-8">
+              <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</Link>
+              <Link href="/random" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                Playground
               </Link>
-            ) : (
+              <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
+            </nav>
+
+            {!loading && !user && (
               <>
                 <Link 
                   href="/login"
@@ -366,21 +368,27 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* Feature 4 - Large */}
-              <div className="md:col-span-2 bg-muted/30 border border-border rounded-3xl p-8 md:p-10 overflow-hidden relative group">
+              {/* Feature 4 - Random */}
+              <Link href="/random" className="md:col-span-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-3xl p-8 md:p-10 overflow-hidden relative group hover:border-primary/50 transition-all">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <ShieldCheck className="w-32 h-32" />
+                  <Gamepad2 className="w-32 h-32" />
                 </div>
                 <div className="relative z-10 max-w-md">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
-                    <ShieldCheck className="w-6 h-6 text-primary" />
+                    <Sparkles className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-3">Unbiased & Objective</h3>
+                  <h3 className="text-2xl font-semibold mb-3 flex items-center gap-2">
+                    Instant Decision Playground
+                    <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold uppercase tracking-tight">New</span>
+                  </h3>
                   <p className="text-muted-foreground leading-relaxed text-lg">
-                    Remove emotional blindspots. Decisely looks purely at the variables, providing a neutral, data-driven perspective on highly charged decisions.
+                    Sometimes you just need to roll the dice. Use our virtual dice, cards, and coin flips for those quick choices that don't need a full AI simulation.
                   </p>
+                  <div className="mt-6 flex items-center gap-2 text-primary font-medium group-hover:gap-4 transition-all">
+                    Try Playground <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </section>
@@ -485,8 +493,8 @@ export default function LandingPage() {
       <footer className="border-t border-border/50 bg-background py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <Image src="/decisely-light.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain dark:hidden" />
-            <Image src="/decisely.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain hidden dark:block" />
+            <Image src="/decisely-light.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain dark:hidden" style={{ height: 'auto' }} />
+            <Image src="/decisely.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} />
             <span className="text-sm text-muted-foreground ml-2">© {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">

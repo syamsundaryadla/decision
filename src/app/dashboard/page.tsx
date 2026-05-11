@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { DecisionSimulator } from "@/components/DecisionSimulator";
-import { LogOut, Sun, Moon, Sparkles, Clock } from "lucide-react";
+import { LogOut, Sun, Moon, Sparkles, Clock, BrainCircuit } from "lucide-react";
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
@@ -46,6 +46,25 @@ export default function DashboardPage() {
               <Image src="/decisely-light.png" alt="Decisely" width={140} height={56} className="h-10 md:h-14 w-auto object-contain dark:hidden" priority />
               <Image src="/decisely.png" alt="Decisely" width={120} height={48} className="h-8 md:h-12 w-auto object-contain hidden dark:block" priority />
             </Link>
+
+            <div className="flex items-center gap-6 flex-1 ml-8">
+              <div className="hidden sm:flex bg-muted/50 p-1 rounded-xl">
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium bg-background shadow-sm text-foreground"
+                >
+                  <BrainCircuit className="w-4 h-4 text-primary" />
+                  AI Mode
+                </Link>
+                <Link
+                  href="/random"
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Playground
+                </Link>
+              </div>
+            </div>
 
             {/* Right actions */}
             <div className="flex items-center gap-2">
