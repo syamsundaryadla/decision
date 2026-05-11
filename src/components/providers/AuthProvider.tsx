@@ -17,7 +17,7 @@ import {
   type User,
 } from "firebase/auth";
 import { auth, googleProvider, db } from "@/lib/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { useAppStore } from "@/lib/store";
 
 interface AuthContextType {
@@ -53,8 +53,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+      
+      // On login, ensure the user document exists in Firestore
+      // This seeds credits and isNewUser flag so they persist on refresh
+      if (firebaseUser && db) {
+        const userDocRef = doc(db, "users", firebaseUser.uid);
+        await setDoc(userDocRef, {
+          // Only set these fields if the document doesn't already exist (merge: true)
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoURL: firebaseUser.photoURL,
+          // These fields are only written if missing (handled by merge)
+          // The actual credit init is done below with a conditional
+        }, { merge: true });
+
+        // Check if doc exists to decide whether to seed credits
+        const { getDoc } = await import("firebase/firestore");
+        const snap = await getDoc(userDocRef);
+        if (!snap.exists() || snap.data()?.credits === undefined) {
+          // Brand new user — seed 5 credits
+          await setDoc(userDocRef, {
+            credits: 5,
+            subscriptionStatus: "free",
+            isNewUser: true,
+            role: "user",
+            isSuspended: false,
+            createdAt: serverTimestamp(),
+          }, { merge: true });
+        }
+      }
+
       setLoading(false);
     });
 
@@ -69,19 +99,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+        // Always read from Firestore — this is the single source of truth
         setUserAccount({
-          credits: data.credits ?? 0,
+          credits: data.credits ?? 5,
           subscriptionStatus: data.subscriptionStatus ?? "free",
           isNewUser: data.isNewUser ?? false,
         });
-      } else {
-        // First time user - they'll get credits on first analysis via API
-        setUserAccount({ 
-          credits: 5, 
-          subscriptionStatus: "free", 
-          isNewUser: true 
-        });
       }
+      // If doc doesn't exist yet, don't change state — 
+      // the onAuthStateChanged above will create it
     });
 
     return () => unsubscribe();

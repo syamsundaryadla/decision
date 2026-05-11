@@ -69,43 +69,34 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
       const userDoc = await transaction.get(userRef);
 
       if (!userDoc.exists) {
-        console.log(`[CREDIT CHECK] New user detected for UID: ${uid}. Granting 5 credits (1 used now).`);
+        // Doc shouldn't be missing (AuthProvider creates it on login), 
+        // but handle defensively
+        console.log(`[CREDIT CHECK] User doc missing for UID: ${uid}. Creating with 5 credits.`);
         transaction.set(userRef, { 
-          credits: 4, 
+          credits: 4,  // 5 granted - 1 for this analysis
           subscriptionStatus: "free",
           role: "user",
           isSuspended: false,
+          isNewUser: false,
           createdAt: FieldValue.serverTimestamp() 
         });
         
-        // Log transactions
         const grantRef = db.collection("credit_transactions").doc();
         transaction.set(grantRef, {
-          userId: uid,
-          amount: 5,
-          type: "grant",
-          description: "Initial signup grant",
-          createdAt: FieldValue.serverTimestamp()
+          userId: uid, amount: 5, type: "grant",
+          description: "Initial grant (fallback)", createdAt: FieldValue.serverTimestamp()
         });
         const usageRef = db.collection("credit_transactions").doc();
         transaction.set(usageRef, {
-          userId: uid,
-          amount: -1,
-          type: "usage",
-          description: "Analysis request",
-          createdAt: FieldValue.serverTimestamp()
+          userId: uid, amount: -1, type: "usage",
+          description: "Analysis request", createdAt: FieldValue.serverTimestamp()
         });
 
-        // Track aggregate stats
         const today = new Date().toISOString().split('T')[0];
         const statsRef = db.collection("analytics_daily").doc(today);
         transaction.set(statsRef, {
-          date: today,
-          totalRequests: FieldValue.increment(1),
-          freeCreditsUsed: FieldValue.increment(1),
-          paidCreditsUsed: FieldValue.increment(0),
-          failedRequests: FieldValue.increment(0),
-          newUsers: FieldValue.increment(1)
+          date: today, totalRequests: FieldValue.increment(1),
+          freeCreditsUsed: FieldValue.increment(1), newUsers: FieldValue.increment(1)
         }, { merge: true });
 
         return { allowed: true, credits: 4 };

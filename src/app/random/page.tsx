@@ -86,8 +86,8 @@ export default function RandomDecisionPage() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <Image src="/decisely-light.png" alt="Decisely" width={110} height={44} className="h-8 md:h-10 w-auto object-contain dark:hidden" priority />
-              <Image src="/decisely.png" alt="Decisely" width={100} height={40} className="h-7 md:h-9 w-auto object-contain hidden dark:block" priority />
+              <Image src="/decisely-light.png" alt="Decisely" width={90} height={36} className="h-6 md:h-8 w-auto object-contain dark:hidden" priority />
+              <Image src="/decisely.png" alt="Decisely" width={90} height={36} className="h-6 md:h-8 w-auto object-contain hidden dark:block" priority />
             </Link>
 
             <div className="flex items-center gap-6 flex-1 ml-8">

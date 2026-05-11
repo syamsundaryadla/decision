@@ -228,8 +228,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={130} height={52} className="h-9 md:h-12 w-auto object-contain dark:hidden" style={{ height: 'auto' }} priority />
-              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={130} height={52} className="h-9 md:h-12 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} priority />
+              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={100} height={40} className="h-7 md:h-9 w-auto object-contain dark:hidden" style={{ height: 'auto' }} priority />
+              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={100} height={40} className="h-7 md:h-9 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} priority />
             </Link>
           </motion.div>
           <motion.div 
