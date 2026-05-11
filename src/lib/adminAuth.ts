@@ -1,8 +1,4 @@
 import { NextRequest } from "next/server";
-import { verifyAuth } from "@/app/api/analyze/route"; // Actually, we can't easily import this if it relies on other things or isn't exported well. Wait, verifyAuth is in route.ts, let's see.
-
-// Since verifyAuth is in api/analyze/route.ts, it's better to move it to a shared lib or just write a generic one for admin.
-// Actually, let's implement the admin auth helper.
 import { adminDb } from "@/lib/firebase-admin";
 
 export async function verifyAdminAuth(req: NextRequest) {
