@@ -83,6 +83,7 @@ export interface UserAccount {
   email?: string;
   role?: "user" | "admin" | "super_admin";
   isSuspended?: boolean;
+  isNewUser?: boolean;
   credits: number;
   subscriptionStatus: "free" | "pro" | "enterprise";
   lastBilled?: string;

@@ -55,6 +55,7 @@ const initialOptions: OptionInput[] = [
 const defaultUserAccount: UserAccount = {
   credits: 0,
   subscriptionStatus: "free",
+  isNewUser: false,
   settings: {
     emailNotifications: true,
     aiVerbosity: "detailed",

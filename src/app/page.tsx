@@ -400,19 +400,19 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
               {/* Free Tier */}
-              <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
-                <h3 className="text-2xl font-semibold mb-2">Pay As You Go</h3>
-                <p className="text-muted-foreground mb-6">Perfect for occasional important choices.</p>
+              <div className="bg-card border border-border rounded-3xl p-8 shadow-sm flex flex-col">
+                <h3 className="text-2xl font-semibold mb-2">Free</h3>
+                <p className="text-muted-foreground mb-6">Perfect to try out the simulator.</p>
                 <div className="mb-8">
-                  <span className="text-5xl font-bold">₹9</span>
-                  <span className="text-muted-foreground"> / analysis</span>
+                  <span className="text-5xl font-bold">₹0</span>
+                  <span className="text-muted-foreground"></span>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  {['Full AI analysis report', 'Standard execution speed', 'Basic domains included', 'Email support'].map((feat, i) => (
-                    <li key={i} className="flex items-center gap-3 text-muted-foreground">
-                      <CheckCircle2 className="w-5 h-5 text-primary" />
+                <ul className="space-y-4 mb-8 flex-1">
+                  {['5 full analyses included', 'Standard execution speed', 'Basic domains included'].map((feat, i) => (
+                    <li key={i} className="flex items-center gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                       {feat}
                     </li>
                   ))}
@@ -425,23 +425,73 @@ export default function LandingPage() {
                 </Link>
               </div>
 
+              {/* Pay per use */}
+              <div className="bg-card border border-border rounded-3xl p-8 shadow-sm flex flex-col">
+                <h3 className="text-2xl font-semibold mb-2">Pay per use</h3>
+                <p className="text-muted-foreground mb-6">For occasional important choices.</p>
+                <div className="mb-8">
+                  <span className="text-5xl font-bold">₹5</span>
+                  <span className="text-muted-foreground"> / analysis</span>
+                </div>
+                <ul className="space-y-4 mb-8 flex-1">
+                  {['Pay only for what you use', 'Standard execution speed', 'Email support'].map((feat, i) => (
+                    <li key={i} className="flex items-center gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+                <Link 
+                  href="/login"
+                  className="w-full inline-flex items-center justify-center py-3 rounded-xl font-medium border border-border hover:bg-muted transition-colors"
+                >
+                  Get Started
+                </Link>
+              </div>
+
+              {/* Plus Tier */}
+              <div className="bg-card border-2 border-primary/50 rounded-3xl p-8 shadow-md flex flex-col">
+                <h3 className="text-2xl font-semibold mb-2 flex items-center gap-2">
+                  Plus
+                </h3>
+                <p className="text-muted-foreground mb-6">For regular decision makers.</p>
+                <div className="mb-8">
+                  <span className="text-5xl font-bold">₹99</span>
+                  <span className="text-muted-foreground"> / 25 analyses</span>
+                </div>
+                <ul className="space-y-4 mb-8 flex-1">
+                  {['Everything in Pay per use', 'Save 20% per analysis', 'Priority processing queue'].map((feat, i) => (
+                    <li key={i} className="flex items-center gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+                <Link 
+                  href="/login"
+                  className="w-full inline-flex items-center justify-center py-3 rounded-xl font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  Get Plus
+                </Link>
+              </div>
+
               {/* Pro Tier */}
-              <div className="bg-card border-2 border-primary rounded-3xl p-8 shadow-xl relative">
+              <div className="bg-card border-2 border-primary rounded-3xl p-8 shadow-xl relative flex flex-col">
                 <div className="absolute top-0 right-8 -translate-y-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                   Most Popular
                 </div>
                 <h3 className="text-2xl font-semibold mb-2 flex items-center gap-2">
-                  Pro Bundle <Sparkles className="w-5 h-5 text-primary" />
+                  Pro <Sparkles className="w-5 h-5 text-primary shrink-0" />
                 </h3>
-                <p className="text-muted-foreground mb-6">For frequent decision makers.</p>
+                <p className="text-muted-foreground mb-6">For professionals and teams.</p>
                 <div className="mb-8">
-                  <span className="text-5xl font-bold text-primary">₹99</span>
-                  <span className="text-muted-foreground"> / 15 analyses</span>
+                  <span className="text-5xl font-bold text-primary">₹349</span>
+                  <span className="text-muted-foreground"> / 100 analyses</span>
                 </div>
-                <ul className="space-y-4 mb-8">
-                  {['Everything in Pay As You Go', 'Save 45% per analysis', 'Priority processing queue', 'Advanced AI verbosity controls'].map((feat, i) => (
-                    <li key={i} className="flex items-center gap-3 text-muted-foreground">
-                      <CheckCircle2 className="w-5 h-5 text-primary" />
+                <ul className="space-y-4 mb-8 flex-1">
+                  {['Everything in Plus', 'Save 30% per analysis', 'Highest priority queue', 'Advanced AI verbosity controls'].map((feat, i) => (
+                    <li key={i} className="flex items-center gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                       {feat}
                     </li>
                   ))}
@@ -450,7 +500,7 @@ export default function LandingPage() {
                   href="/login"
                   className="w-full inline-flex items-center justify-center py-3 rounded-xl font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
                 >
-                  Get Pro Bundle
+                  Get Pro
                 </Link>
               </div>
             </div>

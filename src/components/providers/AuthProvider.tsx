@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       } else {
         // First time user - they'll get credits on first analysis via API
-        setUserAccount({ credits: 5, subscriptionStatus: "free" });
+        setUserAccount({ credits: 5, subscriptionStatus: "free", isNewUser: true });
       }
     });
 
