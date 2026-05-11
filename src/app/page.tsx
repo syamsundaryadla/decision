@@ -228,8 +228,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain dark:hidden" style={{ height: 'auto' }} priority />
-              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={160} height={64} className="h-10 md:h-16 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} priority />
+              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={130} height={52} className="h-9 md:h-12 w-auto object-contain dark:hidden" style={{ height: 'auto' }} priority />
+              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={130} height={52} className="h-9 md:h-12 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} priority />
             </Link>
           </motion.div>
           <motion.div 
@@ -367,7 +367,7 @@ export default function LandingPage() {
         </AnimatePresence>
       </header>
 
-      <main className="flex-1">
+      <main className={`flex-1 transition-all duration-300 ${isMobileMenuOpen ? "blur-md pointer-events-none opacity-50" : ""}`}>
         {loading && !user ? (
           <div className="min-h-[80vh] flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />

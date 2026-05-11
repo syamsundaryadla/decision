@@ -182,8 +182,8 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <Image src="/decisely-light.png" alt="Decisely" width={140} height={56} className="h-10 md:h-14 w-auto object-contain dark:hidden" priority />
-              <Image src="/decisely.png" alt="Decisely" width={120} height={48} className="h-8 md:h-12 w-auto object-contain hidden dark:block" priority />
+              <Image src="/decisely-light.png" alt="Decisely" width={110} height={44} className="h-8 md:h-10 w-auto object-contain dark:hidden" priority />
+              <Image src="/decisely.png" alt="Decisely" width={100} height={40} className="h-7 md:h-9 w-auto object-contain hidden dark:block" priority />
             </Link>
 
             <div className="flex items-center gap-6 flex-1 ml-8">
@@ -314,7 +314,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 w-full max-w-[900px] mx-auto px-4 md:px-6 py-6 md:py-8">
+      <main className={`flex-1 transition-all duration-300 ${isMobileMenuOpen ? "blur-md pointer-events-none opacity-50" : ""} w-full max-w-[900px] mx-auto px-4 md:px-6 py-6 md:py-8`}>
         <DecisionSimulator />
       </main>
     </div>
