@@ -27,6 +27,8 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useAppStore } from "@/lib/store";
+import { db } from "@/lib/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -57,8 +59,23 @@ export default function LandingPage() {
   const [isPlaygroundMenuOpen, setIsPlaygroundMenuOpen] = useState(false);
   const { userAccount, setUserAccount } = useAppStore();
 
-  const handleSelectPlan = (plan: string) => {
+  const handleSelectPlan = async (plan: string) => {
+    // Update local state
     setUserAccount({ isNewUser: false });
+    
+    // Persist to Firestore if user is logged in
+    if (user) {
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        await updateDoc(userDocRef, {
+          isNewUser: false,
+          selectedPlan: plan,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error("Error updating user plan status:", error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -351,64 +368,11 @@ export default function LandingPage() {
       </header>
 
       <main className="flex-1">
-        {loading ? (
+        {loading && !user ? (
           <div className="min-h-[80vh] flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : user ? (
-          /* User Menu / Entry Page */
-          <section className="relative pt-20 pb-20 lg:pt-32 lg:pb-32 overflow-hidden min-h-[85vh] flex flex-col items-center justify-center">
-            {/* Background decorative elements */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
-              <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-pulse" />
-              <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-blue-500/10 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-            </div>
-
-            <div className="max-w-4xl mx-auto px-6 text-center relative z-10 w-full">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-12"
-              >
-                <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-                  Welcome back, <span className="text-primary">{user.displayName?.split(" ")[0] || "User"}</span>
-                </h1>
-                <p className="text-xl text-muted-foreground">What would you like to do today?</p>
-              </motion.div>
-
-              <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-                <Link href="/dashboard" className="group relative p-8 rounded-3xl border border-border bg-card/50 hover:bg-card hover:border-primary/50 transition-all hover:shadow-2xl hover:shadow-primary/10 text-left flex flex-col h-full overflow-hidden">
-                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <BrainCircuit className="w-32 h-32" />
-                  </div>
-                  <div className="bg-primary/10 text-primary p-4 rounded-2xl w-fit mb-6">
-                    <BrainCircuit className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3">AI Dashboard</h3>
-                  <p className="text-muted-foreground mb-6 flex-1">Use advanced AI to analyze complex decisions and simulate outcomes.</p>
-                  <div className="flex items-center gap-2 text-primary font-bold group-hover:gap-4 transition-all">
-                    Go to Dashboard <ArrowRight className="w-5 h-5" />
-                  </div>
-                </Link>
-
-                <Link href="/random" className="group relative p-8 rounded-3xl border border-border bg-card/50 hover:bg-card hover:border-primary/50 transition-all hover:shadow-2xl hover:shadow-primary/10 text-left flex flex-col h-full overflow-hidden">
-                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <Sparkles className="w-32 h-32" />
-                  </div>
-                  <div className="bg-blue-500/10 text-blue-500 p-4 rounded-2xl w-fit mb-6">
-                    <Gamepad2 className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3">Playground</h3>
-                  <p className="text-muted-foreground mb-6 flex-1">Quick decisions using interactive dice, cards, and more.</p>
-                  <div className="flex items-center gap-2 text-blue-500 font-bold group-hover:gap-4 transition-all">
-                    Open Playground <ArrowRight className="w-5 h-5" />
-                  </div>
-                </Link>
-              </div>
-            </div>
-          </section>
         ) : (
-          /* Default Landing Page */
           <>
             {/* Hero Section */}
         <section className="relative pt-24 pb-20 lg:pt-36 lg:pb-32 overflow-hidden">
