@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { useAppStore } from "@/lib/store";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -54,13 +55,147 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPlaygroundMenuOpen, setIsPlaygroundMenuOpen] = useState(false);
+  const { userAccount, setUserAccount } = useAppStore();
+
+  const handleSelectPlan = (plan: string) => {
+    setUserAccount({ isNewUser: false });
+  };
 
   useEffect(() => {
     setMounted(true);
   }, []);
   
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden selection:bg-primary/20">
+    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden selection:bg-primary/20 relative">
+      {/* Onboarding Plan Selection Modal */}
+      {userAccount.isNewUser && (
+        <div className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-sm overflow-y-auto">
+          <div className="min-h-screen px-4 py-12 md:py-24 flex flex-col items-center">
+            <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                Choose your plan
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+                Select a plan to start making better decisions. You can upgrade or downgrade at any time.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
+              {/* Free Tier */}
+              <div className="bg-card border border-border rounded-3xl p-6 shadow-sm flex flex-col">
+                <h3 className="text-xl font-semibold mb-2">Free</h3>
+                <p className="text-muted-foreground text-sm mb-6">Perfect to try out the simulator.</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">₹0</span>
+                </div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {['5 full analyses included', 'Standard execution speed', 'Basic domains included'].map((feat, i) => (
+                    <li key={i} className="flex items-start gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button 
+                  onClick={() => handleSelectPlan('free')}
+                  className="w-full inline-flex items-center justify-center py-2.5 rounded-xl font-medium border border-border hover:bg-muted transition-colors"
+                >
+                  Select Free
+                </button>
+              </div>
+
+              {/* Pay per use */}
+              <div className="bg-card border border-border rounded-3xl p-6 shadow-sm flex flex-col">
+                <h3 className="text-xl font-semibold mb-2">Pay per use</h3>
+                <p className="text-muted-foreground text-sm mb-6">For occasional important choices.</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">₹5</span>
+                  <span className="text-muted-foreground text-sm"> / analysis</span>
+                </div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {['Pay only for what you use', 'Standard execution speed', 'Email support'].map((feat, i) => (
+                    <li key={i} className="flex items-start gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button 
+                  onClick={() => handleSelectPlan('pay_per_use')}
+                  className="w-full inline-flex items-center justify-center py-2.5 rounded-xl font-medium border border-border hover:bg-muted transition-colors"
+                >
+                  Select Plan
+                </button>
+              </div>
+
+              {/* Plus Tier */}
+              <div className="bg-card border-2 border-primary/50 rounded-3xl p-6 shadow-md flex flex-col">
+                <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                  Plus
+                </h3>
+                <p className="text-muted-foreground text-sm mb-6">For regular decision makers.</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">₹99</span>
+                  <span className="text-muted-foreground text-sm"> / 25 analyses</span>
+                </div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {['Everything in Pay per use', 'Save 20% per analysis', 'Priority processing queue'].map((feat, i) => (
+                    <li key={i} className="flex items-start gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button 
+                  onClick={() => handleSelectPlan('plus')}
+                  className="w-full inline-flex items-center justify-center py-2.5 rounded-xl font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  Select Plus
+                </button>
+              </div>
+
+              {/* Pro Tier */}
+              <div className="bg-card border-2 border-primary rounded-3xl p-6 shadow-xl relative flex flex-col">
+                <div className="absolute top-0 right-6 -translate-y-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                  Most Popular
+                </div>
+                <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                  Pro <Sparkles className="w-4 h-4 text-primary shrink-0" />
+                </h3>
+                <p className="text-muted-foreground text-sm mb-6">For professionals and teams.</p>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-primary">₹349</span>
+                  <span className="text-muted-foreground text-sm"> / 100 analyses</span>
+                </div>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {['Everything in Plus', 'Save 30% per analysis', 'Highest priority queue', 'Advanced AI verbosity controls'].map((feat, i) => (
+                    <li key={i} className="flex items-start gap-3 text-muted-foreground text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button 
+                  onClick={() => handleSelectPlan('pro')}
+                  className="w-full inline-flex items-center justify-center py-2.5 rounded-xl font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                >
+                  Select Pro
+                </button>
+              </div>
+            </div>
+            
+            <div className="mt-12">
+              <button 
+                onClick={signOut}
+                className="text-muted-foreground hover:text-foreground text-sm transition-colors flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
