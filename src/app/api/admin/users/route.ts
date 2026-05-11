@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
         transaction.update(userRef, { credits: FieldValue.increment(amount) });
         
-        const txRef = adminDb.collection("credit_transactions").doc();
+        const txRef = adminDb!.collection("credit_transactions").doc();
         transaction.set(txRef, {
           userId,
           amount,
