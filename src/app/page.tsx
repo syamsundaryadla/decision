@@ -28,7 +28,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useAppStore } from "@/lib/store";
 import { db } from "@/lib/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -67,11 +67,11 @@ export default function LandingPage() {
     if (user) {
       try {
         const userDocRef = doc(db, "users", user.uid);
-        await updateDoc(userDocRef, {
+        await setDoc(userDocRef, {
           isNewUser: false,
           selectedPlan: plan,
           updatedAt: new Date().toISOString()
-        });
+        }, { merge: true });
       } catch (error) {
         console.error("Error updating user plan status:", error);
       }

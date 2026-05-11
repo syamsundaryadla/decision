@@ -9,6 +9,8 @@ import { useTheme } from "next-themes";
 import { DecisionSimulator } from "@/components/DecisionSimulator";
 import { LogOut, Sun, Moon, Sparkles, Clock, BrainCircuit, Menu, X, Dice5, Layers, CheckCircle2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { db } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
@@ -19,9 +21,23 @@ export default function DashboardPage() {
   const [isPlaygroundMenuOpen, setIsPlaygroundMenuOpen] = useState(false);
   const { userAccount, setUserAccount } = useAppStore();
 
-  const handleSelectPlan = (plan: string) => {
-    // Dismiss the modal. Payment integration will be handled in the next stage.
+  const handleSelectPlan = async (plan: string) => {
+    // Dismiss the modal
     setUserAccount({ isNewUser: false });
+    
+    // Persist to Firestore if user is logged in
+    if (user) {
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        await setDoc(userDocRef, {
+          isNewUser: false,
+          selectedPlan: plan,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (error) {
+        console.error("Error updating user plan status:", error);
+      }
+    }
   };
 
   useEffect(() => {

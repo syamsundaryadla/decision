@@ -72,10 +72,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserAccount({
           credits: data.credits ?? 0,
           subscriptionStatus: data.subscriptionStatus ?? "free",
+          isNewUser: data.isNewUser ?? false,
         });
       } else {
         // First time user - they'll get credits on first analysis via API
-        setUserAccount({ credits: 5, subscriptionStatus: "free", isNewUser: true });
+        setUserAccount({ 
+          credits: 5, 
+          subscriptionStatus: "free", 
+          isNewUser: true 
+        });
       }
     });
 
