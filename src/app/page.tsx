@@ -176,12 +176,7 @@ export default function LandingPage() {
                 Get Started
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <a 
-                href="#how-it-works"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 rounded-full font-medium text-xl border border-border bg-background/50 backdrop-blur-sm hover:bg-muted/80 transition-all"
-              >
-                Watch Demo
-              </a>
+
             </motion.div>
 
             {/* Product Mockup Preview */}

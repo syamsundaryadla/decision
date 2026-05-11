@@ -59,10 +59,12 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
     return { allowed: true, credits: 999 };
   }
 
-  const userRef = adminDb.collection("users").doc(uid);
+  const db = adminDb;
+
+  const userRef = db.collection("users").doc(uid);
 
   try {
-    const result = await adminDb.runTransaction(async (transaction) => {
+    const result = await db.runTransaction(async (transaction) => {
       console.log(`[CREDIT CHECK] Verifying credits for UID: ${uid}`);
       const userDoc = await transaction.get(userRef);
 
@@ -77,7 +79,7 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
         });
         
         // Log transactions
-        const grantRef = adminDb.collection("credit_transactions").doc();
+        const grantRef = db.collection("credit_transactions").doc();
         transaction.set(grantRef, {
           userId: uid,
           amount: 5,
@@ -85,7 +87,7 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
           description: "Initial signup grant",
           createdAt: FieldValue.serverTimestamp()
         });
-        const usageRef = adminDb.collection("credit_transactions").doc();
+        const usageRef = db.collection("credit_transactions").doc();
         transaction.set(usageRef, {
           userId: uid,
           amount: -1,
@@ -96,7 +98,7 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
 
         // Track aggregate stats
         const today = new Date().toISOString().split('T')[0];
-        const statsRef = adminDb.collection("analytics_daily").doc(today);
+        const statsRef = db.collection("analytics_daily").doc(today);
         transaction.set(statsRef, {
           date: today,
           totalRequests: FieldValue.increment(1),
@@ -126,7 +128,7 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
 
       transaction.update(userRef, { credits: FieldValue.increment(-1) });
       
-      const usageRef = adminDb.collection("credit_transactions").doc();
+      const usageRef = db.collection("credit_transactions").doc();
       transaction.set(usageRef, {
         userId: uid,
         amount: -1,
@@ -137,7 +139,7 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
 
       // Track aggregate stats
       const today = new Date().toISOString().split('T')[0];
-      const statsRef = adminDb.collection("analytics_daily").doc(today);
+      const statsRef = db.collection("analytics_daily").doc(today);
       transaction.set(statsRef, {
         date: today,
         totalRequests: FieldValue.increment(1),
@@ -169,7 +171,8 @@ export async function POST(req: NextRequest) {
     if (!rateCheck.success) {
       // Log rate limit violation if adminDb is available
       if (adminDb) {
-        await adminDb.collection('security_logs').add({
+        const db = adminDb;
+        await db.collection('security_logs').add({
           type: "rate_limit_violation",
           ip,
           endpoint: "/api/analyze",
@@ -390,12 +393,13 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code fences, 
         
         // Log Gemini failure for analytics
         if (adminDb && mode === "final-analysis") {
+          const db = adminDb;
           const today = new Date().toISOString().split('T')[0];
-          await adminDb.collection("analytics_daily").doc(today).set({
+          await db.collection("analytics_daily").doc(today).set({
             failedRequests: FieldValue.increment(1)
           }, { merge: true });
 
-          await adminDb.collection("api_logs").add({
+          await db.collection("api_logs").add({
             userId: authResult.uid,
             status: geminiResponse.status,
             error: errorText.substring(0, 500),
