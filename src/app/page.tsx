@@ -843,7 +843,9 @@ export default function LandingPage() {
             </Link>
           </motion.div>
         </section>
-      </main>
+      </>
+    )}
+  </main>
 
       {/* Footer */}
       <footer className="border-t border-border/50 bg-background py-12">
