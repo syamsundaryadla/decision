@@ -39,10 +39,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Payment gateway not configured." }, { status: 500 });
     }
 
-    // Masked log for debugging
-    console.log(`[RAZORPAY] Using Key ID: ${keyId.substring(0, 8)}...${keyId.slice(-4)}`);
-    console.log(`[RAZORPAY] Using Secret: ${keySecret.substring(0, 1)}...${keySecret.slice(-1)} (Length: ${keySecret.length})`);
-
     const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
     const authResult = await verifyAuth(req);
     if (!authResult) {

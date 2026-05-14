@@ -90,8 +90,14 @@ export function RazorpayButton({
       const { order_id, amount, currency } = await orderRes.json();
 
       // STEP 2: Open Razorpay checkout modal
+      const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      
+      if (!keyId) {
+        throw new Error("Razorpay Key ID is missing in frontend. Check Vercel environment variables.");
+      }
+
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: keyId,
         amount,
         currency,
         name: "Decisely",
