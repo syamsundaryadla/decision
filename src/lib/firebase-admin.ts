@@ -40,7 +40,7 @@ function initAdmin() {
           
         serviceAccount = JSON.parse(decodedKey);
         
-        console.log("Firebase Admin: Successfully parsed service account key for project:", serviceAccount.project_id);
+
         
         adminApp = initializeApp({
           credential: cert(serviceAccount),

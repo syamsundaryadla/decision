@@ -1,9 +1,26 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
 const siteUrl = "https://decisely.vercel.app";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -24,9 +41,9 @@ export const metadata: Metadata = {
     "financial decisions",
     "business strategy tool",
   ],
-  authors: [{ name: "Decisely" }],
+  authors: [{ name: "Risenine Technologies Pvt Ltd" }],
   creator: "Decisely",
-  publisher: "Decisely",
+  publisher: "Risenine Technologies Pvt Ltd",
   icons: {
     icon: "/decisely.png",
     apple: "/decisely.png",
@@ -54,7 +71,6 @@ export const metadata: Metadata = {
     description:
       "Analyze your choices, simulate outcomes, and make confident decisions backed by data.",
     images: ["/decisely.png"],
-    creator: "@decisely",
   },
   robots: {
     index: true,
@@ -78,16 +94,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="scroll-smooth" data-scroll-behavior="smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
+    <html lang="en" suppressHydrationWarning className={`scroll-smooth ${inter.variable}`} data-scroll-behavior="smooth">
+      <body className="font-sans antialiased">
         <ThemeProvider>
           <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>

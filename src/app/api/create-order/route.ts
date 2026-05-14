@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log(`[RAZORPAY] Order created: ${order.id} for plan: ${plan}`);
+
 
     return NextResponse.json({
       order_id: order.id,

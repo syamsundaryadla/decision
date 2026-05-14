@@ -65,13 +65,13 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
 
   try {
     const result = await db.runTransaction(async (transaction) => {
-      console.log(`[CREDIT CHECK] Verifying credits for UID: ${uid}`);
+
       const userDoc = await transaction.get(userRef);
 
       if (!userDoc.exists) {
         // Doc shouldn't be missing (AuthProvider creates it on login), 
         // but handle defensively
-        console.log(`[CREDIT CHECK] User doc missing for UID: ${uid}. Creating with 5 credits.`);
+        console.warn(`[CREDIT CHECK] User doc missing for UID: ${uid}. Creating with 5 credits.`);
         transaction.set(userRef, { 
           credits: 4,  // 5 granted - 1 for this analysis
           subscriptionStatus: "free",
@@ -110,7 +110,7 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
       }
 
       const currentCredits = data?.credits ?? 0;
-      console.log(`[CREDIT CHECK] UID: ${uid} has ${currentCredits} credits.`);
+
 
       if (currentCredits < 1) {
         console.warn(`[CREDIT CHECK] Access denied for UID: ${uid} (0 credits).`);
@@ -138,7 +138,7 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
         paidCreditsUsed: FieldValue.increment(isPaidAccount ? 1 : 0),
       }, { merge: true });
 
-      console.log(`[CREDIT CHECK] Decremented credit for UID: ${uid}. Remaining: ${currentCredits - 1}`);
+
       return { allowed: true, credits: currentCredits - 1 };
     });
 

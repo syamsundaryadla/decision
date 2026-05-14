@@ -275,9 +275,11 @@ export default function DashboardPage() {
                 className="flex items-center gap-2 pl-2 border-l border-border hover:bg-muted/50 rounded-lg py-1 px-2 transition-colors"
               >
                 {user.photoURL && (
-                  <img
+                  <Image
                     src={user.photoURL}
                     alt={user.displayName || "User"}
+                    width={28}
+                    height={28}
                     className="w-7 h-7 rounded-full"
                     referrerPolicy="no-referrer"
                   />
@@ -359,7 +361,7 @@ export default function DashboardPage() {
                   className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-muted/50 hover:bg-muted transition-colors border border-border/50"
                 >
                   {user.photoURL ? (
-                    <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                    <Image src={user.photoURL} alt="" width={32} height={32} className="w-8 h-8 rounded-full" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
                       {user.displayName?.[0] || user.email?.[0]}

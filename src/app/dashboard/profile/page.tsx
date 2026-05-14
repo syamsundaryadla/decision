@@ -20,6 +20,7 @@ import {
   LogOut
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { RazorpayButton } from "@/components/RazorpayButton";
 
@@ -88,7 +89,7 @@ export default function ProfilePage() {
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center">
             {user?.photoURL ? (
-              <img src={user.photoURL} alt="Avatar" className="w-full h-full rounded-2xl" />
+              <Image src={user.photoURL} alt="Avatar" width={80} height={80} className="w-full h-full rounded-2xl object-cover" />
             ) : (
               <User className="w-10 h-10 text-primary-foreground" />
             )}

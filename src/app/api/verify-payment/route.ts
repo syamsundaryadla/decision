@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    console.log(`[PAYMENT] ✓ Payment verified for user ${authResult.uid}, plan: ${plan}, payment: ${razorpay_payment_id}`);
+    console.log(`[PAYMENT] ✓ Payment verified for user ${authResult.uid}, plan: ${plan}`);
 
     return NextResponse.json({
       success: true,

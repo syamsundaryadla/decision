@@ -293,7 +293,7 @@ export default function LandingPage() {
                   className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors border-l border-border ml-2"
                 >
                   {user.photoURL ? (
-                    <img src={user.photoURL} alt="" className="w-7 h-7 rounded-full" />
+                    <Image src={user.photoURL} alt="" width={28} height={28} className="w-7 h-7 rounded-full" />
                   ) : (
                     <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
                       {user.displayName?.[0] || user.email?.[0]}
@@ -375,7 +375,7 @@ export default function LandingPage() {
                     className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-muted/50 hover:bg-muted transition-colors border border-border/50"
                   >
                     {user.photoURL ? (
-                      <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                      <Image src={user.photoURL} alt="" width={32} height={32} className="w-8 h-8 rounded-full" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
                         {user.displayName?.[0] || user.email?.[0]}

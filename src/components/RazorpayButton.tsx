@@ -112,7 +112,7 @@ export function RazorpayButton({
         throw new Error("Razorpay Key ID is missing in frontend. Check Vercel environment variables.");
       }
 
-      console.log("[RAZORPAY] Frontend Key ID:", keyId);
+
 
       const options = {
         key: keyId,
