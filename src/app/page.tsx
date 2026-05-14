@@ -29,6 +29,7 @@ import { useTheme } from "next-themes";
 import { useAppStore } from "@/lib/store";
 import { db } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { RazorpayButton } from "@/components/RazorpayButton";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -58,6 +59,17 @@ export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPlaygroundMenuOpen, setIsPlaygroundMenuOpen] = useState(false);
   const { userAccount, setUserAccount } = useAppStore();
+  const [paymentMessage, setPaymentMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handlePaymentSuccess = (plan: string) => {
+    setPaymentMessage({ type: "success", text: `✓ Payment successful! Your ${plan} plan credits are now active.` });
+    setTimeout(() => setPaymentMessage(null), 6000);
+  };
+
+  const handlePaymentError = (message: string) => {
+    setPaymentMessage({ type: "error", text: message });
+    setTimeout(() => setPaymentMessage(null), 6000);
+  };
 
   const handleSelectPlan = async (plan: string) => {
     // Update local state
@@ -742,12 +754,22 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link 
-                  href="/login"
-                  className="w-full inline-flex items-center justify-center py-3 rounded-xl font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                >
-                  Get Plus
-                </Link>
+                {user ? (
+                  <RazorpayButton
+                    plan="plus"
+                    label="Get Plus — ₹99"
+                    className="w-full py-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors font-medium"
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                ) : (
+                  <Link 
+                    href="/login"
+                    className="w-full inline-flex items-center justify-center py-3 rounded-xl font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  >
+                    Get Plus
+                  </Link>
+                )}
               </div>
 
               {/* Pro Tier */}
@@ -771,12 +793,22 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link 
-                  href="/login"
-                  className="w-full inline-flex items-center justify-center py-3 rounded-xl font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
-                >
-                  Get Pro
-                </Link>
+                {user ? (
+                  <RazorpayButton
+                    plan="pro"
+                    label="Get Pro — ₹349"
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity font-medium"
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                ) : (
+                  <Link 
+                    href="/login"
+                    className="w-full inline-flex items-center justify-center py-3 rounded-xl font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                  >
+                    Get Pro
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -808,6 +840,17 @@ export default function LandingPage() {
           </motion.div>
         </section>
       </>
+    )}
+
+    {/* Global payment toast */}
+    {paymentMessage && (
+      <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-2xl shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 duration-300 whitespace-nowrap ${
+        paymentMessage.type === "success"
+          ? "bg-emerald-500 text-white"
+          : "bg-destructive text-destructive-foreground"
+      }`}>
+        {paymentMessage.text}
+      </div>
     )}
   </main>
 

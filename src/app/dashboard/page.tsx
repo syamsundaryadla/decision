@@ -11,6 +11,7 @@ import { LogOut, Sun, Moon, Sparkles, Clock, BrainCircuit, Menu, X, Dice5, Layer
 import { useAppStore } from "@/lib/store";
 import { db } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { RazorpayButton } from "@/components/RazorpayButton";
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
@@ -20,12 +21,10 @@ export default function DashboardPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPlaygroundMenuOpen, setIsPlaygroundMenuOpen] = useState(false);
   const { userAccount, setUserAccount } = useAppStore();
+  const [paymentMessage, setPaymentMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleSelectPlan = async (plan: string) => {
-    // Dismiss the modal
     setUserAccount({ isNewUser: false });
-    
-    // Persist to Firestore if user is logged in
     if (user) {
       try {
         const userDocRef = doc(db, "users", user.uid);
@@ -38,6 +37,18 @@ export default function DashboardPage() {
         console.error("Error updating user plan status:", error);
       }
     }
+  };
+
+  const handlePaymentSuccess = async (plan: string) => {
+    setPaymentMessage({ type: "success", text: `Payment successful! Your ${plan} plan is now active.` });
+    // Dismiss plan modal — Firestore is updated by the verify endpoint
+    setUserAccount({ isNewUser: false });
+    setTimeout(() => setPaymentMessage(null), 6000);
+  };
+
+  const handlePaymentError = (message: string) => {
+    setPaymentMessage({ type: "error", text: message });
+    setTimeout(() => setPaymentMessage(null), 6000);
   };
 
   useEffect(() => {
@@ -141,12 +152,13 @@ export default function DashboardPage() {
                     </li>
                   ))}
                 </ul>
-                <button 
-                  onClick={() => handleSelectPlan('plus')}
-                  className="w-full inline-flex items-center justify-center py-2.5 rounded-xl font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                >
-                  Select Plus
-                </button>
+                <RazorpayButton
+                  plan="plus"
+                  label="Get Plus — ₹99"
+                  className="w-full py-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
               </div>
 
               {/* Pro Tier */}
@@ -170,12 +182,13 @@ export default function DashboardPage() {
                     </li>
                   ))}
                 </ul>
-                <button 
-                  onClick={() => handleSelectPlan('pro')}
-                  className="w-full inline-flex items-center justify-center py-2.5 rounded-xl font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
-                >
-                  Select Pro
-                </button>
+                <RazorpayButton
+                  plan="pro"
+                  label="Get Pro — ₹349"
+                  className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                />
               </div>
             </div>
             
@@ -188,6 +201,16 @@ export default function DashboardPage() {
                 Sign out
               </button>
             </div>
+            {/* Payment feedback banner */}
+            {paymentMessage && (
+              <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-2xl shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 duration-300 ${
+                paymentMessage.type === "success"
+                  ? "bg-emerald-500 text-white"
+                  : "bg-destructive text-destructive-foreground"
+              }`}>
+                {paymentMessage.text}
+              </div>
+            )}
           </div>
         </div>
       )}

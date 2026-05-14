@@ -21,12 +21,25 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { RazorpayButton } from "@/components/RazorpayButton";
 
 export default function ProfilePage() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const { userAccount, setUserAccount } = useAppStore();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [paymentMessage, setPaymentMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handlePaymentSuccess = (plan: string) => {
+    setShowSubscriptionModal(false);
+    setPaymentMessage({ type: "success", text: `✓ Payment successful! Your ${plan} plan is now active.` });
+    setTimeout(() => setPaymentMessage(null), 6000);
+  };
+
+  const handlePaymentError = (message: string) => {
+    setPaymentMessage({ type: "error", text: message });
+    setTimeout(() => setPaymentMessage(null), 6000);
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -228,54 +241,77 @@ export default function ProfilePage() {
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="w-6 h-6 text-primary" />
               </div>
-              <h2 className="text-xl font-bold mb-2">Upgrade Your Plan</h2>
+              <h2 className="text-xl font-bold mb-2">Top Up Credits</h2>
               <p className="text-sm text-muted-foreground">
-                Choose the plan that fits your decision-making needs.
+                Choose a plan to add more analyses to your account.
               </p>
             </div>
-            
-            <div className="p-6 space-y-4 bg-muted/30">
-              {/* Pay As You Go */}
-              <button 
-                className="w-full flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors text-left"
-                onClick={() => setShowSubscriptionModal(false)}
-              >
-                <div>
-                  <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    Pay As You Go
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-1">1 analysis (1 credit)</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold">₹9</span>
-                </div>
-              </button>
 
-              {/* Pro Plan */}
-              <button 
-                className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5 hover:bg-primary/10 transition-colors text-left relative overflow-hidden"
-                onClick={() => setShowSubscriptionModal(false)}
-              >
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">
+            <div className="p-6 space-y-3 bg-muted/30">
+              {/* Pay per use */}
+              <div className="w-full flex items-center justify-between p-4 rounded-xl border border-border bg-card">
+                <div>
+                  <h3 className="font-semibold text-foreground">Pay per use</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">1 analysis credit</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-bold">&#8377;5</span>
+                  <RazorpayButton
+                    plan="pay_per_use"
+                    label="Buy"
+                    className="text-xs font-semibold bg-muted hover:bg-muted/80 px-4 py-2 rounded-lg transition-colors"
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                </div>
+              </div>
+
+              {/* Plus */}
+              <div className="w-full flex items-center justify-between p-4 rounded-xl border border-primary/40 bg-primary/5">
+                <div>
+                  <h3 className="font-semibold text-foreground flex items-center gap-1.5">
+                    Plus
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">25 analyses</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-bold">&#8377;99</span>
+                  <RazorpayButton
+                    plan="plus"
+                    label="Buy"
+                    className="text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-lg transition-colors"
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
+                </div>
+              </div>
+
+              {/* Pro */}
+              <div className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">
                   Best Value
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground flex items-center gap-2">
-                    Pro Plan <SparklesIcon className="w-3.5 h-3.5 text-primary" />
+                  <h3 className="font-semibold text-foreground flex items-center gap-1.5">
+                    Pro <SparklesIcon className="w-3.5 h-3.5 text-primary" />
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-success" /> 15 Analyses included
-                  </p>
-                  <p className="text-[10px] text-success mt-0.5 font-medium">Save 45%</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">100 analyses &middot; Save 30%</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold text-primary">₹99</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-bold text-primary">&#8377;349</span>
+                  <RazorpayButton
+                    plan="pro"
+                    label="Buy"
+                    className="text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 px-4 py-2 rounded-lg transition-opacity"
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                  />
                 </div>
-              </button>
+              </div>
             </div>
-            
+
             <div className="p-4 border-t border-border flex justify-center bg-card">
-              <button 
+              <button
                 onClick={() => setShowSubscriptionModal(false)}
                 className="text-sm text-muted-foreground hover:text-foreground font-medium"
               >
@@ -283,6 +319,17 @@ export default function ProfilePage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Payment feedback toast */}
+      {paymentMessage && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-2xl shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 duration-300 whitespace-nowrap ${
+          paymentMessage.type === "success"
+            ? "bg-emerald-500 text-white"
+            : "bg-destructive text-destructive-foreground"
+        }`}>
+          {paymentMessage.text}
         </div>
       )}
     </div>
