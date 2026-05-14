@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useAppStore } from "@/lib/store";
 
 // Razorpay types
 declare global {
@@ -52,15 +53,30 @@ export function RazorpayButton({
   onError,
 }: RazorpayButtonProps) {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { isPaymentProcessing, setIsPaymentProcessing } = useAppStore();
+  
+  // Also keep a local loading state for UI spinner on *this* specific button
+  const [isLocalLoading, setIsLocalLoading] = useState(false);
+
+  // Safety net: if component unmounts, clear global state
+  useEffect(() => {
+    return () => {
+      if (isLocalLoading) {
+        setIsPaymentProcessing(false);
+      }
+    };
+  }, [isLocalLoading, setIsPaymentProcessing]);
 
   const handlePayment = async () => {
+    if (isPaymentProcessing) return; // Prevent double clicks globally
+
     if (!user) {
       onError?.("Please sign in to make a payment.");
       return;
     }
 
-    setLoading(true);
+    setIsLocalLoading(true);
+    setIsPaymentProcessing(true);
 
     try {
       // Load the Razorpay checkout script
@@ -114,7 +130,8 @@ export function RazorpayButton({
         },
         modal: {
           ondismiss: () => {
-            setLoading(false);
+            setIsLocalLoading(false);
+            setIsPaymentProcessing(false);
           },
         },
         handler: async (response: {
@@ -147,7 +164,8 @@ export function RazorpayButton({
           } catch (verifyError: any) {
             onError?.(verifyError.message ?? "Payment verification failed. Contact support.");
           } finally {
-            setLoading(false);
+            setIsLocalLoading(false);
+            setIsPaymentProcessing(false);
           }
         },
       };
@@ -157,24 +175,26 @@ export function RazorpayButton({
       rzp.on("payment.failed", (response: any) => {
         console.error("Razorpay payment failed:", response.error);
         onError?.(response.error?.description ?? "Payment failed. Please try again.");
-        setLoading(false);
+        setIsLocalLoading(false);
+        setIsPaymentProcessing(false);
       });
 
       rzp.open();
     } catch (err: any) {
       console.error("Payment initiation error:", err);
       onError?.(err.message ?? "Failed to initiate payment. Please try again.");
-      setLoading(false);
+      setIsLocalLoading(false);
+      setIsPaymentProcessing(false);
     }
   };
 
   return (
     <button
       onClick={handlePayment}
-      disabled={loading}
+      disabled={isPaymentProcessing}
       className={`relative inline-flex items-center justify-center gap-2 font-medium transition-all disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
     >
-      {loading ? (
+      {isLocalLoading ? (
         <>
           <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
           Processing...

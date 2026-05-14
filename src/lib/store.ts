@@ -14,6 +14,7 @@ interface AppState {
   isAnalyzing: boolean;
   loadingMessage: string;
   error: string | null;
+  isPaymentProcessing: boolean;
 
   // View state
   showResults: boolean;
@@ -37,6 +38,7 @@ interface AppState {
   setIsAnalyzing: (isAnalyzing: boolean) => void;
   setLoadingMessage: (message: string) => void;
   setError: (error: string | null) => void;
+  setIsPaymentProcessing: (isProcessing: boolean) => void;
   setShowResults: (show: boolean) => void;
   setCurrentStep: (step: "input" | "questionnaire" | "results") => void;
   setQuestions: (questions: DecisionQuestion[]) => void;
@@ -71,6 +73,7 @@ export const useAppStore = create<AppState>((set) => ({
   isAnalyzing: false,
   loadingMessage: "",
   error: null,
+  isPaymentProcessing: false,
   showResults: false,
   currentStep: "input",
   questions: [],
@@ -113,6 +116,7 @@ export const useAppStore = create<AppState>((set) => ({
   setIsAnalyzing: (isAnalyzing) => set({ isAnalyzing }),
   setLoadingMessage: (loadingMessage) => set({ loadingMessage }),
   setError: (error) => set({ error }),
+  setIsPaymentProcessing: (isPaymentProcessing) => set({ isPaymentProcessing }),
   setShowResults: (show) => set({ showResults: show }),
   setCurrentStep: (step) => set({ currentStep: step }),
   setQuestions: (questions) => set({ questions }),
