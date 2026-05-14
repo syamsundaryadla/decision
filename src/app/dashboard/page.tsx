@@ -285,15 +285,6 @@ export default function DashboardPage() {
                   {user.displayName?.split(" ")[0]}
                 </span>
               </Link>
-
-              <button
-                onClick={signOut}
-                className="p-2 rounded-lg hover:bg-muted transition-colors duration-200"
-                aria-label="Sign out"
-                id="sign-out-button"
-              >
-                <LogOut className="w-4 h-4 text-muted-foreground" />
-              </button>
               <button
                 className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

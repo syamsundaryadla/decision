@@ -155,13 +155,6 @@ export default function RandomDecisionPage() {
                     </span>
                   </Link>
 
-                  <button
-                    onClick={signOut}
-                    className="p-2 rounded-lg hover:bg-muted transition-colors duration-200"
-                    aria-label="Sign out"
-                  >
-                    <LogOut className="w-4 h-4 text-muted-foreground" />
-                  </button>
                 </>
               ) : (
                 <div className="pl-2 border-l border-border flex items-center gap-2">
