@@ -319,61 +319,85 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="lg:hidden absolute top-full left-0 right-0 border-b border-border bg-background/95 backdrop-blur-xl p-4 flex flex-col gap-2 shadow-xl z-40"
+              className="lg:hidden absolute top-full left-0 right-0 border-b border-border bg-background/80 backdrop-blur-2xl p-6 flex flex-col gap-6 shadow-2xl z-40"
             >
-              <Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 font-medium">
-                Home
-              </Link>
-              
-              <Link 
-                href="/dashboard" 
-                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 text-muted-foreground font-medium transition-colors"
-              >
-                <BrainCircuit className="w-5 h-5 text-primary" />
-                AI Mode
-              </Link>
-              
-              <div className="flex flex-col">
-                <button 
-                  onClick={() => setIsPlaygroundMenuOpen(!isPlaygroundMenuOpen)}
-                  className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-muted/50 text-muted-foreground font-medium transition-colors"
+              <div className="grid grid-cols-2 gap-4">
+                <Link 
+                  href="/dashboard" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-all group"
                 >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-5 h-5" />
-                    Playground
+                  <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <BrainCircuit className="w-6 h-6 text-primary" />
                   </div>
-                </button>
-                
-                {isPlaygroundMenuOpen && (
-                  <div className="flex flex-col gap-1 pl-12 pr-4 pb-2">
-                    <Link href="/random?mode=dice" className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50">
-                      <Dice5 className="w-4 h-4 text-primary" />
-                      Dice Roll
-                    </Link>
-                    <Link href="/random?mode=cards" className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50">
-                      <Layers className="w-4 h-4 text-primary" />
-                      Card Draw
-                    </Link>
+                  <span className="text-sm font-bold tracking-tight">AI Mode</span>
+                </Link>
+
+                <Link 
+                  href="/random?mode=dice" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Dice5 className="w-6 h-6 text-blue-500" />
                   </div>
-                )}
+                  <span className="text-sm font-bold tracking-tight">Dice Roll</span>
+                </Link>
+
+                <Link 
+                  href="/random?mode=cards" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Layers className="w-6 h-6 text-purple-500" />
+                  </div>
+                  <span className="text-sm font-bold tracking-tight">Card Draw</span>
+                </Link>
+
+                <Link 
+                  href="/dashboard/history" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-orange-500/10 border border-orange-500/20 hover:bg-orange-500/20 transition-all group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Clock className="w-6 h-6 text-orange-500" />
+                  </div>
+                  <span className="text-sm font-bold tracking-tight">History</span>
+                </Link>
               </div>
 
-              {user ? (
-                <>
-                  <Link href="/dashboard/history" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted/50 text-muted-foreground font-medium transition-colors">
-                    <Clock className="w-5 h-5" />
-                    History
+              <div className="flex flex-col gap-3">
+                {user ? (
+                  <Link 
+                    href="/dashboard/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-muted/50 hover:bg-muted transition-colors border border-border/50"
+                  >
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                        {user.displayName?.[0] || user.email?.[0]}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{user.displayName || "My Profile"}</p>
+                      <p className="text-xs text-muted-foreground truncate">Settings & Billing</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </Link>
-                  <button onClick={signOut} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive font-medium transition-colors text-left w-full">
-                    <LogOut className="w-5 h-5" />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <Link href="/login" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-primary-foreground font-medium text-center justify-center mt-2">
-                  Sign In
-                </Link>
-              )}
+                ) : (
+                  <Link 
+                    href="/login" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                  >
+                    Get Started for Free
+                    <Sparkles className="w-4 h-4" />
+                  </Link>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
