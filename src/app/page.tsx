@@ -857,15 +857,18 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-border/50 bg-background py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <Image src="/decisely-light.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain dark:hidden" style={{ height: 'auto' }} />
-            <Image src="/decisely.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} />
-            <span className="text-sm text-muted-foreground ml-2">© {new Date().getFullYear()}</span>
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Image src="/decisely-light.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain dark:hidden" style={{ height: 'auto' }} />
+              <Image src="/decisely.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} />
+              <span className="text-sm text-muted-foreground ml-2">© {new Date().getFullYear()}</span>
+            </div>
+            <span className="hidden md:block text-border">|</span>
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">by risenine technologies pvt ltd</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-foreground transition-colors">Terms of Service</Link>
-            <Link href="https://twitter.com/decisely" className="hover:text-foreground transition-colors">Twitter</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
           </div>
         </div>
       </footer>
