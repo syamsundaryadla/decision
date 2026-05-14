@@ -304,7 +304,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="md:hidden absolute top-full left-0 right-0 border-b border-border bg-background/80 backdrop-blur-2xl p-6 flex flex-col gap-6 shadow-2xl z-40"
+              className="md:hidden absolute top-full left-0 right-0 border-b border-border/50 bg-background/60 backdrop-blur-3xl p-6 flex flex-col gap-6 shadow-2xl z-40"
             >
               <div className="grid grid-cols-2 gap-y-10 gap-x-6 py-4">
                 <Link 
