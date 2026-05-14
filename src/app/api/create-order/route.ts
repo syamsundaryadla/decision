@@ -10,16 +10,21 @@ const PLAN_AMOUNTS: Record<string, number> = {
 
 async function verifyAuth(req: NextRequest): Promise<{ uid: string } | null> {
   if (!adminAuth) {
+    console.error("[AUTH] adminAuth is null. Check FIREBASE_ADMIN_KEY configuration.");
     if (process.env.NODE_ENV === "development") return { uid: "dev-user" };
     return null;
   }
   const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) return null;
+  if (!authHeader?.startsWith("Bearer ")) {
+    console.error("[AUTH] Missing or invalid Authorization header");
+    return null;
+  }
   const token = authHeader.split("Bearer ")[1];
   try {
     const decoded = await adminAuth.verifyIdToken(token);
     return { uid: decoded.uid };
-  } catch {
+  } catch (error: any) {
+    console.error("[AUTH] Token verification failed:", error.message);
     return null;
   }
 }

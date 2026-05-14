@@ -40,11 +40,13 @@ function initAdmin() {
           
         serviceAccount = JSON.parse(decodedKey);
         
+        console.log("Firebase Admin: Successfully parsed service account key for project:", serviceAccount.project_id);
+        
         adminApp = initializeApp({
           credential: cert(serviceAccount),
         });
-      } catch (e) {
-        console.error("Failed to parse FIREBASE_ADMIN_KEY:", e);
+      } catch (e: any) {
+        console.error("Failed to parse FIREBASE_ADMIN_KEY:", e.message);
         return;
       }
     } else {
@@ -54,7 +56,7 @@ function initAdmin() {
         adminApp = initializeApp({ projectId });
       } else {
         console.warn(
-          "Firebase Admin: No FIREBASE_ADMIN_KEY or project ID found. Auth verification will be unavailable."
+          "Firebase Admin: No FIREBASE_ADMIN_KEY found. Authentication will fail in production."
         );
         return;
       }
