@@ -65,8 +65,14 @@ export default function RandomDecisionPage() {
     }
   };
 
+  const updateOption = (index: number, value: string) => {
+    const newOptions = [...options];
+    newOptions[index] = value;
+    setOptions(newOptions);
+  };
+
   const handleRoll = () => {
-    if (isRolling) return;
+    if (isRolling || options.length === 0) return;
     setIsRolling(true);
     setResult(null);
     
@@ -299,10 +305,18 @@ export default function RandomDecisionPage() {
                     key={i} 
                     className={cn(
                       "group flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/30 transition-all",
-                      result === i && "border-primary bg-primary/5 ring-1 ring-primary"
+                      result === i && "border-primary bg-primary/5 ring-1 ring-primary shadow-sm"
                     )}
                   >
-                    <div className="flex-1 text-sm font-medium">{opt}</div>
+                    <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary shrink-0">
+                      {i + 1}
+                    </div>
+                    <input 
+                      type="text"
+                      value={opt}
+                      onChange={(e) => updateOption(i, e.target.value)}
+                      className="flex-1 bg-transparent border-none text-sm font-medium outline-none focus:text-primary transition-colors"
+                    />
                     <button 
                       onClick={() => removeOption(i)}
                       className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all"
@@ -411,23 +425,18 @@ function DiceComponent({ isRolling, result }: { isRolling: boolean, result: numb
       transition={{ duration: 0.5, repeat: isRolling ? Infinity : 0, ease: "linear" }}
       className="relative w-40 h-40 flex items-center justify-center z-10"
     >
-      <div className="w-32 h-32 bg-card border-4 border-primary rounded-3xl shadow-2xl flex items-center justify-center relative overflow-hidden">
-        {/* Dice Dots */}
-        <div className="grid grid-cols-3 grid-rows-3 gap-2 w-20 h-20">
-          {/* Example dots for 5 */}
-          <div className="w-4 h-4 rounded-full bg-primary" />
-          <div />
-          <div className="w-4 h-4 rounded-full bg-primary" />
-          <div />
-          <div className="w-4 h-4 rounded-full bg-primary" />
-          <div />
-          <div className="w-4 h-4 rounded-full bg-primary" />
-          <div />
-          <div className="w-4 h-4 rounded-full bg-primary" />
+      <div className="w-32 h-32 bg-card border-4 border-primary rounded-[32px] shadow-2xl flex items-center justify-center relative overflow-hidden">
+        {/* Dice Content */}
+        <div className="flex items-center justify-center">
+          {isRolling ? (
+            <Sparkles className="w-12 h-12 text-primary/30 animate-pulse" />
+          ) : (
+            <span className="text-6xl font-black text-primary drop-shadow-md">
+              {result !== null ? result + 1 : "?"}
+            </span>
+          )}
         </div>
       </div>
-      
-      {/* Dynamic Dots based on result would go here */}
     </motion.div>
   );
 }
