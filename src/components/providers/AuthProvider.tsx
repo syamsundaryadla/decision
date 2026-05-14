@@ -60,28 +60,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // This seeds credits and isNewUser flag so they persist on refresh
       if (firebaseUser && db) {
         const userDocRef = doc(db, "users", firebaseUser.uid);
-        await setDoc(userDocRef, {
-          // Only set these fields if the document doesn't already exist (merge: true)
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-          // These fields are only written if missing (handled by merge)
-          // The actual credit init is done below with a conditional
-        }, { merge: true });
-
-        // Check if doc exists to decide whether to seed credits
-        const { getDoc } = await import("firebase/firestore");
+        const { getDoc, setDoc, serverTimestamp } = await import("firebase/firestore");
+        
+        // Fetch FIRST to avoid cache race conditions where partial merges hide existing fields
         const snap = await getDoc(userDocRef);
-        if (!snap.exists() || snap.data()?.credits === undefined) {
-          // Brand new user — seed 5 credits
+        
+        if (!snap.exists()) {
+          // Brand new user
           await setDoc(userDocRef, {
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL,
             credits: 5,
             subscriptionStatus: "free",
             isNewUser: true,
             role: "user",
             isSuspended: false,
             createdAt: serverTimestamp(),
-          }, { merge: true });
+          });
+        } else {
+          // Existing user, just update profile info if needed (don't touch credits)
+          const data = snap.data();
+          if (
+            data.email !== firebaseUser.email || 
+            data.displayName !== firebaseUser.displayName || 
+            data.photoURL !== firebaseUser.photoURL ||
+            data.credits === undefined // Safety check for corrupted docs
+          ) {
+            await setDoc(userDocRef, {
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+              photoURL: firebaseUser.photoURL,
+              ...(data.credits === undefined ? { credits: 5 } : {})
+            }, { merge: true });
+          }
         }
       }
 
