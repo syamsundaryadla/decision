@@ -279,28 +279,6 @@ export default function RandomDecisionPage() {
             <p className="text-muted-foreground mt-2 text-lg">Let the universe decide your next move.</p>
           </div>
           
-          <div className="flex bg-muted p-1 rounded-2xl w-fit">
-            <button 
-              onClick={() => { setMode("dice"); setResult(null); }}
-              className={cn(
-                "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all",
-                mode === "dice" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Dice5 className="w-4 h-4" />
-              Dice Roll
-            </button>
-            <button 
-              onClick={() => { setMode("cards"); setResult(null); }}
-              className={cn(
-                "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all",
-                mode === "cards" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Layers className="w-4 h-4" />
-              Card Draw
-            </button>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
