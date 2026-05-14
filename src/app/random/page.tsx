@@ -192,47 +192,47 @@ export default function RandomDecisionPage() {
               exit={{ opacity: 0, y: -10 }}
               className="md:hidden absolute top-full left-0 right-0 border-b border-border bg-background/80 backdrop-blur-2xl p-6 flex flex-col gap-6 shadow-2xl z-40"
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-y-10 gap-x-6 py-4">
                 <Link 
                   href="/dashboard" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-all group"
+                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <BrainCircuit className="w-6 h-6 text-primary" />
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
+                    <BrainCircuit className="w-7 h-7 text-foreground/80" />
                   </div>
-                  <span className="text-sm font-bold tracking-tight">AI Mode</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">AI Mode</span>
                 </Link>
 
                 <button 
                   onClick={() => { setMode("dice"); setResult(null); setIsMobileMenuOpen(false); }}
-                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all group"
+                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Dice5 className="w-6 h-6 text-blue-500" />
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
+                    <Dice5 className="w-7 h-7 text-foreground/80" />
                   </div>
-                  <span className="text-sm font-bold tracking-tight">Dice Roll</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Dice Roll</span>
                 </button>
 
                 <button 
                   onClick={() => { setMode("cards"); setResult(null); setIsMobileMenuOpen(false); }}
-                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all group"
+                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Layers className="w-6 h-6 text-purple-500" />
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
+                    <Layers className="w-7 h-7 text-foreground/80" />
                   </div>
-                  <span className="text-sm font-bold tracking-tight">Card Draw</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Card Draw</span>
                 </button>
 
                 <Link 
                   href="/dashboard/history" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl bg-orange-500/10 border border-orange-500/20 hover:bg-orange-500/20 transition-all group"
+                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Clock className="w-6 h-6 text-orange-500" />
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
+                    <Clock className="w-7 h-7 text-foreground/80" />
                   </div>
-                  <span className="text-sm font-bold tracking-tight">History</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">History</span>
                 </Link>
               </div>
 
