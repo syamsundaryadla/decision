@@ -4,7 +4,7 @@ import { useAppStore } from "@/lib/store";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { DOMAIN_LABELS, type Domain } from "@/lib/types";
+import { DOMAIN_LABELS, DOMAIN_PARAMETERS, type Domain } from "@/lib/types";
 import {
   Briefcase,
   TrendingUp,
@@ -36,27 +36,22 @@ const LOADING_MESSAGES = [
 ];
 
 export function InputFlow() {
-  const {
-    scenario,
-    setScenario,
-    domain,
-    setDomain,
-    options,
-    addOption,
-    updateOption,
-    removeOption,
-    parameters,
-    updateParameter,
-    setQuestions,
-    setCurrentStep,
-    userAccount,
-    setUserAccount,
-    setIsAnalyzing,
-    setLoadingMessage,
-    setError,
-    isAnalyzing,
-    error,
-  } = useAppStore();
+  const scenario = useAppStore((state) => state.scenario);
+  const setScenario = useAppStore((state) => state.setScenario);
+  const domain = useAppStore((state) => state.domain);
+  const setDomain = useAppStore((state) => state.setDomain);
+  const options = useAppStore((state) => state.options);
+  const addOption = useAppStore((state) => state.addOption);
+  const updateOption = useAppStore((state) => state.updateOption);
+  const removeOption = useAppStore((state) => state.removeOption);
+  const setQuestions = useAppStore((state) => state.setQuestions);
+  const setCurrentStep = useAppStore((state) => state.setCurrentStep);
+  const userAccount = useAppStore((state) => state.userAccount);
+  const setIsAnalyzing = useAppStore((state) => state.setIsAnalyzing);
+  const setLoadingMessage = useAppStore((state) => state.setLoadingMessage);
+  const setError = useAppStore((state) => state.setError);
+  const isAnalyzing = useAppStore((state) => state.isAnalyzing);
+  const error = useAppStore((state) => state.error);
 
   const { user } = useAuth();
 
@@ -93,6 +88,8 @@ export function InputFlow() {
         throw new Error("Please sign in to use the analysis feature.");
       }
 
+      const currentParameters = useAppStore.getState().parameters;
+
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: {
@@ -104,7 +101,7 @@ export function InputFlow() {
           scenario,
           domain,
           options: options.filter((o) => o.text.trim().length > 0),
-          parameters,
+          parameters: currentParameters,
         }),
       });
 
@@ -242,44 +239,19 @@ export function InputFlow() {
       </section>
 
       {/* Dynamic Parameters */}
-      {domain && parameters.length > 0 && (
+      {domain && DOMAIN_PARAMETERS[domain] && (
         <section>
           <label className="text-sm font-medium text-foreground block mb-4">
             Your preferences
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {parameters.map((param) => (
-              <div
+            {DOMAIN_PARAMETERS[domain].map((param) => (
+              <ParameterSlider
                 key={param.id}
-                className="bg-card border border-border rounded-xl p-4"
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-medium text-foreground">
-                    {param.label}
-                  </span>
-                  <span className="text-xs font-medium text-muted-foreground tabular-nums">
-                    {param.value}%
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground mb-3">
-                  {param.description}
-                </p>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={param.value}
-                  onChange={(e) =>
-                    updateParameter(param.id, parseInt(e.target.value))
-                  }
-                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-muted accent-primary"
-                  id={`param-${param.id}`}
-                />
-                <div className="flex justify-between mt-1.5">
-                  <span className="text-[10px] text-muted-foreground">Low</span>
-                  <span className="text-[10px] text-muted-foreground">High</span>
-                </div>
-              </div>
+                id={param.id}
+                label={param.label}
+                description={param.description}
+              />
             ))}
           </div>
         </section>
@@ -408,4 +380,32 @@ function SparklesIcon(props: React.ComponentProps<"svg">) {
       <path d="M17 19h4"/>
     </svg>
   )
+}
+
+function ParameterSlider({ id, label, description }: { id: string; label: string; description: string }) {
+  const value = useAppStore((state) => state.parameters.find((p) => p.id === id)?.value ?? 50);
+  const updateParameter = useAppStore((state) => state.updateParameter);
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-4">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-sm font-medium text-foreground">{label}</span>
+        <span className="text-xs font-medium text-muted-foreground tabular-nums">{value}%</span>
+      </div>
+      <p className="text-xs text-muted-foreground mb-3">{description}</p>
+      <input
+        type="range"
+        min={0}
+        max={100}
+        value={value}
+        onChange={(e) => updateParameter(id, parseInt(e.target.value))}
+        className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-muted accent-primary"
+        id={`param-${id}`}
+      />
+      <div className="flex justify-between mt-1.5">
+        <span className="text-[10px] text-muted-foreground">Low</span>
+        <span className="text-[10px] text-muted-foreground">High</span>
+      </div>
+    </div>
+  );
 }
