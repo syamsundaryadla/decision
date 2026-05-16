@@ -240,8 +240,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={100} height={40} className="h-7 md:h-9 w-auto object-contain dark:hidden" style={{ height: 'auto' }} priority />
-              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={100} height={40} className="h-7 md:h-9 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} priority />
+              <Image src="/decisely-light.png" alt="Decisely — AI Decision Intelligence Platform" width={90} height={36} className="h-6 md:h-8 w-auto object-contain dark:hidden" priority />
+              <Image src="/decisely.png" alt="Decisely — AI Decision Intelligence Platform" width={90} height={36} className="h-6 md:h-8 w-auto object-contain hidden dark:block" priority />
             </Link>
           </motion.div>
           <motion.div 
@@ -883,8 +883,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col md:flex-row items-center gap-4">
             <div className="flex items-center gap-2">
-              <Image src="/decisely-light.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain dark:hidden" style={{ height: 'auto' }} />
-              <Image src="/decisely.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain hidden dark:block" style={{ height: 'auto' }} />
+              <Image src="/decisely-light.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain dark:hidden" />
+              <Image src="/decisely.png" alt="Decisely" width={80} height={24} className="h-6 w-auto object-contain hidden dark:block" />
               <span className="text-sm text-muted-foreground ml-2">© {new Date().getFullYear()}</span>
             </div>
             <span className="hidden md:block text-border">|</span>
