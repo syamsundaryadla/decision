@@ -67,6 +67,17 @@ export interface AnalysisResult {
   options: AnalysisOptionResult[];
 }
 
+export interface Report {
+  id: string;
+  userId: string;
+  scenario: string;
+  domain: Domain;
+  options: { text: string }[];
+  parameters: DomainParameter[];
+  result: AnalysisResult;
+  createdAt: string | null; // ISO string after serialization
+}
+
 export interface DecisionQuestion {
   id: string;
   text: string;

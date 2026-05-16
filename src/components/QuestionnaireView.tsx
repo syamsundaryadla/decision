@@ -8,6 +8,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { BrainCircuit, Loader2, ChevronRight, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { auth } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 const LOADING_MESSAGES = [
   "Synthesizing your context...",
@@ -36,6 +37,7 @@ export function QuestionnaireView() {
   } = useAppStore();
 
   const { user } = useAuth();
+  const router = useRouter();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [localAnswers, setLocalAnswers] = useState<Record<string, string>>({});
@@ -124,13 +126,11 @@ export function QuestionnaireView() {
 
       // Success
       setUserAccount({ credits: userAccount.credits - 1 });
-      setResult(data);
-      setCurrentStep("results"); // Move to results view
 
-      // Auto-save to Firestore
+      // Save to Firestore and redirect to dedicated report page
       if (user?.uid) {
         try {
-          await addDoc(collection(db, "reports"), {
+          const docRef = await addDoc(collection(db, "reports"), {
             userId: user.uid,
             scenario,
             domain,
@@ -139,10 +139,18 @@ export function QuestionnaireView() {
             result: data,
             createdAt: serverTimestamp(),
           });
+          // Navigate to the dedicated report page
+          router.push(`/report/${docRef.id}`);
+          return; // Don't fall through to local state update
         } catch (saveErr) {
           console.error("Failed to save report to history:", saveErr);
+          // Fall through to local state display if save fails
         }
       }
+
+      // Fallback: show results locally if Firestore save failed or no user
+      setResult(data);
+      setCurrentStep("results");
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Network error. Please check your connection.";
