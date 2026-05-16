@@ -21,7 +21,8 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPlaygroundMenuOpen, setIsPlaygroundMenuOpen] = useState(false);
-  const { userAccount, setUserAccount } = useAppStore();
+  const userAccount = useAppStore((state) => state.userAccount);
+  const setUserAccount = useAppStore((state) => state.setUserAccount);
   const [paymentMessage, setPaymentMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleSelectPlan = async (plan: string) => {
@@ -321,25 +322,14 @@ export default function DashboardPage() {
                 </Link>
 
                 <Link 
-                  href="/random?mode=dice" 
+                  href="/random" 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
                   <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
-                    <Dice5 className="w-7 h-7 text-foreground/80" />
+                    <Sparkles className="w-7 h-7 text-foreground/80" />
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Dice Roll</span>
-                </Link>
-
-                <Link 
-                  href="/random?mode=cards" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
-                >
-                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
-                    <Layers className="w-7 h-7 text-foreground/80" />
-                  </div>
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Card Draw</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Playground</span>
                 </Link>
 
                 <Link 

@@ -7,7 +7,9 @@ import { LoadingScreen } from "./LoadingScreen";
 import { QuestionnaireView } from "./QuestionnaireView";
 
 export function DecisionSimulator() {
-  const { showResults, currentStep, isAnalyzing } = useAppStore();
+  const showResults = useAppStore((state) => state.showResults);
+  const currentStep = useAppStore((state) => state.currentStep);
+  const isAnalyzing = useAppStore((state) => state.isAnalyzing);
 
   if (isAnalyzing) {
     return <LoadingScreen />;

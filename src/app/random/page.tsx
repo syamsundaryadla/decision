@@ -88,7 +88,7 @@ export default function RandomDecisionPage() {
     <div className="min-h-screen bg-background flex flex-col selection:bg-primary/20">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border relative">
-        <div className="max-w-[900px] mx-auto px-4 md:px-6">
+        <div className="max-w-5xl mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
@@ -142,37 +142,31 @@ export default function RandomDecisionPage() {
               )}
 
               {user ? (
-                <>
-                  {/* User avatar / Profile Link */}
-                  <Link 
-                    href="/dashboard/profile"
-                    className="flex items-center gap-2 pl-2 border-l border-border hover:bg-muted/50 rounded-lg py-1 px-2 transition-colors"
-                  >
-                    {user.photoURL && (
-                      <Image
-                        src={user.photoURL}
-                        alt={user.displayName || "User"}
-                        width={28}
-                        height={28}
-                        className="w-7 h-7 rounded-full"
-                        referrerPolicy="no-referrer"
-                      />
-                    )}
-                    <span className="text-xs text-muted-foreground hidden md:block max-w-[120px] truncate">
-                      {user.displayName?.split(" ")[0]}
-                    </span>
-                  </Link>
-
-                </>
+                <Link 
+                  href="/dashboard/profile"
+                  className="hidden md:flex items-center gap-2 pl-2 border-l border-border hover:bg-muted/50 rounded-lg py-1 px-2 transition-colors"
+                >
+                  {user.photoURL && (
+                    <Image
+                      src={user.photoURL}
+                      alt={user.displayName || "User"}
+                      width={28}
+                      height={28}
+                      className="w-7 h-7 rounded-full"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
+                  <span className="text-xs text-muted-foreground max-w-[120px] truncate">
+                    {user.displayName?.split(" ")[0]}
+                  </span>
+                </Link>
               ) : (
-                <div className="pl-2 border-l border-border flex items-center gap-2">
-                  <Link 
-                    href="/login"
-                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5"
-                  >
-                    Sign In
-                  </Link>
-                </div>
+                <Link
+                  href="/login"
+                  className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+                >
+                  Sign In
+                </Link>
               )}
               
               <button
@@ -207,23 +201,13 @@ export default function RandomDecisionPage() {
                 </Link>
 
                 <button 
-                  onClick={() => { setMode("dice"); setResult(null); setIsMobileMenuOpen(false); }}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
                   <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
-                    <Dice5 className="w-7 h-7 text-foreground/80" />
+                    <Sparkles className="w-7 h-7 text-foreground/80" />
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Dice Roll</span>
-                </button>
-
-                <button 
-                  onClick={() => { setMode("cards"); setResult(null); setIsMobileMenuOpen(false); }}
-                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
-                >
-                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
-                    <Layers className="w-7 h-7 text-foreground/80" />
-                  </div>
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Card Draw</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Playground</span>
                 </button>
 
                 <Link 
@@ -274,8 +258,8 @@ export default function RandomDecisionPage() {
         </AnimatePresence>
       </header>
 
-      <main className={`flex-1 transition-all duration-300 ${isMobileMenuOpen ? "blur-md pointer-events-none opacity-50" : ""} w-full max-w-[900px] mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10`}>
-      <div className="max-w-4xl mx-auto px-6 py-12 md:py-20">
+      <main className={`flex-1 transition-all duration-300 ${isMobileMenuOpen ? "blur-md pointer-events-none opacity-50" : ""} w-full max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12 relative z-10`}>
+      <div className="w-full">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>
