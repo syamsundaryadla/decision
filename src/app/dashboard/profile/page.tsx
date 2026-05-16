@@ -157,52 +157,8 @@ export default function ProfilePage() {
             Settings
           </h2>
           <div className="bg-card border border-border rounded-2xl p-5 space-y-6">
-            {/* Email Notifications */}
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
-                  <Bell className="w-4 h-4 text-info" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">Email Alerts</p>
-                  <p className="text-xs text-muted-foreground truncate">New analysis results</p>
-                </div>
-              </div>
-              <button 
-                onClick={toggleNotifications}
-                className={cn(
-                  "w-10 h-5 rounded-full transition-colors relative shrink-0",
-                  userAccount.settings.emailNotifications ? "bg-primary" : "bg-muted"
-                )}
-              >
-                <div className={cn(
-                  "absolute top-1 w-3 h-3 bg-white rounded-full transition-all",
-                  userAccount.settings.emailNotifications ? "left-6" : "left-1"
-                )} />
-              </button>
-            </div>
-
-            {/* AI Verbosity */}
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
-                  <MessageSquare className="w-4 h-4 text-warning" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">AI Detail Level</p>
-                  <p className="text-xs text-muted-foreground capitalize truncate">{userAccount.settings.aiVerbosity}</p>
-                </div>
-              </div>
-              <button 
-                onClick={toggleVerbosity}
-                className="text-xs font-medium bg-muted hover:bg-muted/80 px-3 py-1.5 rounded-lg transition-colors shrink-0 whitespace-nowrap"
-              >
-                Toggle
-              </button>
-            </div>
-
             {/* Privacy */}
-            <div className="flex items-center gap-3 border-t border-border pt-6">
+            <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4 text-success" />
               </div>

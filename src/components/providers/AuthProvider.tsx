@@ -16,6 +16,8 @@ import {
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   type User,
 } from "firebase/auth";
+import { motion, AnimatePresence } from "framer-motion";
+import { LogOut, X } from "lucide-react";
 import { auth, googleProvider, db } from "@/lib/firebase";
 import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { useAppStore } from "@/lib/store";
@@ -43,6 +45,7 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const setUserAccount = useAppStore((state) => state.setUserAccount);
 
@@ -153,9 +156,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmSignOut = async () => {
     if (!auth || !auth.onAuthStateChanged) return;
     try {
       await firebaseSignOut(auth);
+      setShowLogoutModal(false);
     } catch (error) {
       console.error("Sign-out error:", error);
       throw error;
@@ -165,6 +173,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={{ user, loading, signInWithGoogle, signUpWithEmail, signInWithEmail, resetPassword, signOut }}>
       {children}
+
+      {/* Global Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="w-full max-w-md overflow-hidden bg-card border border-border rounded-3xl shadow-2xl"
+            >
+              <div className="p-6 md:p-8 space-y-6">
+                <div className="flex items-start justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center text-destructive">
+                    <LogOut className="w-6 h-6" />
+                  </div>
+                  <button
+                    onClick={() => setShowLogoutModal(false)}
+                    className="p-2 rounded-xl hover:bg-muted text-muted-foreground transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-foreground">Sign Out</h3>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Are you sure you want to sign out of your account? You will need to log back in to access your saved decisions and AI history.
+                  </p>
+                </div>
+
+                <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+                  <button
+                    onClick={() => setShowLogoutModal(false)}
+                    className="w-full py-3 px-4 rounded-xl border border-border hover:bg-muted font-medium text-sm transition-colors text-foreground"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmSignOut}
+                    className="w-full py-3 px-4 rounded-xl bg-destructive hover:opacity-90 font-medium text-sm text-destructive-foreground transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-destructive/20"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Yes, Sign Out
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </AuthContext.Provider>
   );
 }
