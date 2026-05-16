@@ -105,13 +105,26 @@ export default function RandomDecisionPage() {
                   <BrainCircuit className="w-4 h-4" />
                   AI Mode
                 </Link>
-                <Link
-                  href="/random"
-                  className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium bg-background shadow-sm text-foreground"
+                <button
+                  onClick={() => setMode("dice")}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
+                    mode === "dice" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
                 >
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  Playground
-                </Link>
+                  <Dice5 className={cn("w-4 h-4", mode === "dice" && "text-primary")} />
+                  Dice
+                </button>
+                <button
+                  onClick={() => setMode("cards")}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors",
+                    mode === "cards" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Layers className={cn("w-4 h-4", mode === "cards" && "text-primary")} />
+                  Cards
+                </button>
               </div>
             </div>
 
@@ -201,13 +214,23 @@ export default function RandomDecisionPage() {
                 </Link>
 
                 <button 
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => { setMode("dice"); setResult(null); setIsMobileMenuOpen(false); }}
                   className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
                   <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
-                    <Sparkles className="w-7 h-7 text-foreground/80" />
+                    <Dice5 className={cn("w-7 h-7", mode === "dice" ? "text-primary" : "text-foreground/80")} />
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Playground</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Dice Roll</span>
+                </button>
+
+                <button 
+                  onClick={() => { setMode("cards"); setResult(null); setIsMobileMenuOpen(false); }}
+                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
+                >
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
+                    <Layers className={cn("w-7 h-7", mode === "cards" ? "text-primary" : "text-foreground/80")} />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Card Draw</span>
                 </button>
 
                 <Link 

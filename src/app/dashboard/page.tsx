@@ -237,11 +237,18 @@ export default function DashboardPage() {
                   AI Mode
                 </Link>
                 <Link
-                  href="/random"
+                  href="/random?mode=dice"
                   className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Playground
+                  <Dice5 className="w-4 h-4" />
+                  Dice
+                </Link>
+                <Link
+                  href="/random?mode=cards"
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Layers className="w-4 h-4" />
+                  Cards
                 </Link>
               </div>
             </div>
@@ -322,14 +329,25 @@ export default function DashboardPage() {
                 </Link>
 
                 <Link 
-                  href="/random" 
+                  href="/random?mode=dice" 
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex flex-col items-center gap-3 transition-all active:scale-95"
                 >
                   <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
-                    <Sparkles className="w-7 h-7 text-foreground/80" />
+                    <Dice5 className="w-7 h-7 text-foreground/80" />
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Playground</span>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Dice Roll</span>
+                </Link>
+
+                <Link 
+                  href="/random?mode=cards" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex flex-col items-center gap-3 transition-all active:scale-95"
+                >
+                  <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
+                    <Layers className="w-7 h-7 text-foreground/80" />
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Card Draw</span>
                 </Link>
 
                 <Link 
