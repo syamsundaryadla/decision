@@ -19,9 +19,40 @@ service cloud.firestore {
       allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
     
-    // Users collection: Users can only read and write their own profile/metadata
+    // Users collection: Users can READ their own profile,
+    // but can only UPDATE safe display fields (NOT credits, role, subscription, suspension).
+    // The server (Firebase Admin SDK) bypasses these rules for privileged writes.
     match /users/{userId} {
-      allow read, write: if isSignedIn() && isOwner(userId);
+      allow read: if isSignedIn() && isOwner(userId);
+      
+      // Allow create only for initial profile setup
+      allow create: if isSignedIn() && isOwner(userId)
+        && request.resource.data.credits is number
+        && request.resource.data.credits <= 5;
+      
+      // Allow update ONLY for safe display fields — block sensitive fields
+      allow update: if isSignedIn() && isOwner(userId)
+        && (!request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['credits', 'role', 'isSuspended', 'subscriptionStatus']));
+    }
+    
+    // Credit transactions: read-only for the owner, writes only via Admin SDK
+    match /credit_transactions/{txId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Server-side only via Admin SDK
+    }
+    
+    // Analytics, security logs, API logs: admin-only via Admin SDK
+    match /analytics_daily/{docId} {
+      allow read, write: if false;
+    }
+    
+    match /security_logs/{logId} {
+      allow read, write: if false;
+    }
+    
+    match /api_logs/{logId} {
+      allow read, write: if false;
     }
     
     // Default: deny everything else

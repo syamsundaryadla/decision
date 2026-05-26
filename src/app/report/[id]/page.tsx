@@ -8,11 +8,13 @@ import { FileText, AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function ReportPage() {
   const params = useParams();
   const reportId = params.id as string;
   const { theme } = useTheme();
+  const { user, loading: authLoading } = useAuth();
 
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,16 +26,34 @@ export default function ReportPage() {
   }, []);
 
   useEffect(() => {
-    if (!reportId) return;
+    if (!reportId || authLoading) return;
+
+    // If not authenticated, show error instead of making an API call that will fail
+    if (!user) {
+      setLoading(false);
+      setError("Please sign in to view this report.");
+      return;
+    }
 
     async function fetchReport() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/reports/${reportId}`);
+        // Get Firebase ID token for authenticated API call
+        const idToken = await user!.getIdToken();
+        
+        const res = await fetch(`/api/reports/${reportId}`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
         if (!res.ok) {
           if (res.status === 404) {
             setError("not_found");
+          } else if (res.status === 401) {
+            setError("Please sign in to view this report.");
+          } else if (res.status === 403) {
+            setError("You don't have permission to view this report.");
           } else {
             const data = await res.json().catch(() => ({}));
             setError(data.error || "Failed to load report.");
@@ -50,7 +70,7 @@ export default function ReportPage() {
     }
 
     fetchReport();
-  }, [reportId]);
+  }, [reportId, user, authLoading]);
 
   // Loading skeleton
   if (loading) {

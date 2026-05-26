@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /dashboard/
-Disallow: /login
-
-Sitemap: https://decisely.vercel.app/sitemap.xml

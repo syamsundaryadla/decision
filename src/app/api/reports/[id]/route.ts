@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
+import { verifyAuth } from "@/lib/verifyAuth";
 
 export async function GET(
   req: NextRequest,
@@ -22,6 +23,15 @@ export async function GET(
       );
     }
 
+    // SEC-002 FIX: Authenticate the request
+    const authResult = await verifyAuth(req);
+    if (!authResult) {
+      return NextResponse.json(
+        { error: "Authentication required." },
+        { status: 401 }
+      );
+    }
+
     const docSnap = await adminDb.collection("reports").doc(id).get();
 
     if (!docSnap.exists) {
@@ -32,6 +42,14 @@ export async function GET(
     }
 
     const data = docSnap.data();
+
+    // SEC-002 FIX: Verify the authenticated user owns this report
+    if (data?.userId && data.userId !== authResult.uid && authResult.uid !== "dev-user") {
+      return NextResponse.json(
+        { error: "You do not have permission to view this report." },
+        { status: 403 }
+      );
+    }
 
     // Serialize Firestore Timestamp to ISO string
     const createdAt = data?.createdAt?.toDate

@@ -205,7 +205,7 @@ export default function DashboardPage() {
             </div>
             {/* Payment feedback banner */}
             {paymentMessage && (
-              <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-2xl shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 duration-300 ${
+              <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-2xl shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 duration-300 max-w-[90vw] text-center ${
                 paymentMessage.type === "success"
                   ? "bg-emerald-500 text-white"
                   : "bg-destructive text-destructive-foreground"

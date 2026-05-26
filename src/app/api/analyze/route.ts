@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminAuth, adminDb } from "@/lib/firebase-admin";
+import { adminDb } from "@/lib/firebase-admin";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { FieldValue } from "firebase-admin/firestore";
+import { verifyAuth } from "@/lib/verifyAuth";
 
 export const maxDuration = 60; // Allow up to 60 seconds for Gemini API response on Vercel
 
@@ -25,36 +26,10 @@ function sanitizeForPrompt(text: string): string {
     .slice(0, 3000); // Hard length limit per field
 }
 
-// [VULN-002 FIX] Verify Firebase ID token and return UID
-async function verifyAuth(req: NextRequest): Promise<{ uid: string } | null> {
-  if (!adminAuth) {
-    console.warn("Firebase Admin Auth not initialized — skipping auth check in development.");
-    // In development without admin SDK, allow requests but log warning
-    if (process.env.NODE_ENV === "development") {
-      return { uid: "dev-user" };
-    }
-    return null;
-  }
-
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const token = authHeader.split("Bearer ")[1];
-  if (!token) return null;
-
-  try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    return { uid: decodedToken.uid };
-  } catch (error) {
-    console.error("Token verification failed:", error);
-    return null;
-  }
-}
+// [SEC-001 FIX] verifyAuth is now imported from @/lib/verifyAuth
 
 // [VULN-006 FIX] Check and decrement credits server-side
-async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = false): Promise<{ allowed: boolean; credits: number }> {
+async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = false): Promise<{ allowed: boolean; credits: number; suspended?: boolean }> {
   if (!adminDb || uid === "dev-user") {
     return { allowed: true, credits: 999 };
   }
@@ -145,8 +120,8 @@ async function checkAndDecrementCredits(uid: string, isPaidAccount: boolean = fa
     return result;
   } catch (error) {
     console.error("Credit check failed:", error);
-    // Fail open in case of transient errors — log for monitoring
-    return { allowed: true, credits: -1 };
+    // [SEC-006 FIX] Fail closed — deny access on transient errors to prevent abuse
+    return { allowed: false, credits: 0 };
   }
 }
 
@@ -231,7 +206,7 @@ export async function POST(req: NextRequest) {
       const isPaid = false; // TODO: Determine from user profile if they have a paid sub
       const creditResult = await checkAndDecrementCredits(authResult.uid, isPaid);
       
-      // @ts-ignore - Handle newly added suspended flag from the modified checkAndDecrementCredits
+      // [SEC-007 FIX] Proper type — suspended is now in the return type
       if (creditResult.suspended) {
         return NextResponse.json(
           { error: "Your account has been suspended." },

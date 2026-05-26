@@ -45,11 +45,8 @@ const jsonLd = {
     price: "9",
     priceCurrency: "INR",
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.8",
-    ratingCount: "120",
-  },
+  // Note: aggregateRating removed — only add when real user reviews exist.
+  // Fabricated ratings violate Google's structured data guidelines.
 };
 
 export default function LandingPage() {
@@ -306,6 +303,7 @@ export default function LandingPage() {
             <button
               className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -868,7 +866,7 @@ export default function LandingPage() {
 
     {/* Global payment toast */}
     {paymentMessage && (
-      <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-2xl shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 duration-300 whitespace-nowrap ${
+      <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 rounded-2xl shadow-xl text-sm font-medium animate-in slide-in-from-bottom-4 duration-300 max-w-[90vw] text-center ${
         paymentMessage.type === "success"
           ? "bg-emerald-500 text-white"
           : "bg-destructive text-destructive-foreground"

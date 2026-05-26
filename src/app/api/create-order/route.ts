@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
-import { adminAuth } from "@/lib/firebase-admin";
+import { verifyAuth } from "@/lib/verifyAuth";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const PLAN_AMOUNTS: Record<string, number> = {
   pay_per_use: 500,  // ₹5 in paise
@@ -8,38 +9,51 @@ const PLAN_AMOUNTS: Record<string, number> = {
   pro: 34900,        // ₹349 in paise
 };
 
-async function verifyAuth(req: NextRequest): Promise<{ uid: string } | null> {
-  if (!adminAuth) {
-    console.error("[AUTH] adminAuth is null. Check FIREBASE_ADMIN_KEY configuration.");
-    if (process.env.NODE_ENV === "development") return { uid: "dev-user" };
+// [PAY-005 FIX] Singleton Razorpay instance — no need to create per-request
+let razorpayInstance: Razorpay | null = null;
+
+function getRazorpay(): Razorpay | null {
+  if (razorpayInstance) return razorpayInstance;
+
+  const keyId = process.env.RAZORPAY_KEY_ID ?? process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
+  const keySecret = process.env.RAZORPAY_KEY_SECRET ?? "";
+
+  if (!keyId || !keySecret) {
+    console.error("[RAZORPAY] Missing credentials — KEY_ID:", !!keyId, "KEY_SECRET:", !!keySecret);
     return null;
   }
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    console.error("[AUTH] Missing or invalid Authorization header");
-    return null;
-  }
-  const token = authHeader.split("Bearer ")[1];
-  try {
-    const decoded = await adminAuth.verifyIdToken(token);
-    return { uid: decoded.uid };
-  } catch (error: any) {
-    console.error("[AUTH] Token verification failed:", error.message);
-    return null;
-  }
+
+  razorpayInstance = new Razorpay({ key_id: keyId, key_secret: keySecret });
+  return razorpayInstance;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const keyId = process.env.RAZORPAY_KEY_ID ?? process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
-    const keySecret = process.env.RAZORPAY_KEY_SECRET ?? "";
+    // [PAY-006 FIX] Rate limit: max 5 order creations per minute per IP
+    const ip = getClientIp(req);
+    const rateCheck = checkRateLimit(`create-order:${ip}`, {
+      maxRequests: 5,
+      windowSeconds: 60,
+    });
 
-    if (!keyId || !keySecret) {
-      console.error("[RAZORPAY] Missing credentials — KEY_ID:", !!keyId, "KEY_SECRET:", !!keySecret);
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please wait before trying again." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil((rateCheck.resetAt - Date.now()) / 1000)),
+          },
+        }
+      );
+    }
+
+    const razorpay = getRazorpay();
+    if (!razorpay) {
       return NextResponse.json({ error: "Payment gateway not configured." }, { status: 500 });
     }
 
-    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    // [SEC-001 FIX] Use shared verifyAuth
     const authResult = await verifyAuth(req);
     if (!authResult) {
       return NextResponse.json({ error: "Authentication required." }, { status: 401 });
@@ -66,8 +80,6 @@ export async function POST(req: NextRequest) {
         plan,
       },
     });
-
-
 
     return NextResponse.json({
       order_id: order.id,
